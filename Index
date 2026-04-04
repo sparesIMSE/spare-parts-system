@@ -1,0 +1,1596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IMSE BVBA — Spare Parts Management</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Serif+Display&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --n900:#061828;--n800:#0C2D4A;--n700:#0F3A60;--n600:#1A4F82;
+  --n500:#2668A8;--n400:#4D88C0;--n300:#80AACC;--n200:#B8D0E6;
+  --n100:#DCE9F4;--n50:#EEF4FA;--n20:#F5F9FD;
+  --g600:#8C5200;--g500:#B36800;--g400:#D98200;--g300:#F5A623;
+  --g200:#FBCF7A;--g100:#FEF0D0;
+  --t600:#08544A;--t400:#0F8070;--t200:#A8DDD8;--t100:#E0F5F3;
+  --r500:#B83232;--r200:#F09090;--r100:#FDEAEA;
+  --gr500:#1A7A42;--gr100:#E6F7EE;
+  --pu500:#6B2FA0;--pu100:#F0E6FA;
+  --bg:#EDF2F8;--surf:#FFFFFF;--surf2:#F2F6FB;--surf3:#E6EDF6;--surf4:#D8E4F0;
+  --bdr:rgba(15,58,96,.1);--bdr2:rgba(15,58,96,.18);--bdr3:rgba(15,58,96,.32);
+  --tx:#0A1E32;--tx2:#1E3D5C;--tx3:#4A6A8A;--tx4:#7A96B2;
+  --ac:var(--n600);--ac-lt:rgba(26,79,130,.09);--ac-glow:rgba(26,79,130,.2);
+  --nw:248px;--hh:58px;--r:8px;--rl:12px;--rxl:18px;
+  --fui:'DM Sans',system-ui,sans-serif;
+  --fds:'DM Serif Display',Georgia,serif;
+  --fmono:'JetBrains Mono',monospace;
+  --shadow:0 1px 4px rgba(10,30,50,.1),0 4px 12px rgba(10,30,50,.06);
+  --shadow-lg:0 4px 24px rgba(10,30,50,.14),0 1px 4px rgba(10,30,50,.08);
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fui);color:var(--tx);font-size:13px;line-height:1.5}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--surf3)}
+::-webkit-scrollbar-thumb{background:var(--n200);border-radius:4px}
+
+/* ══════════════════════ LOGIN SCREEN ══════════════════════ */
+#login-screen{
+  position:fixed;inset:0;z-index:1000;
+  background:linear-gradient(135deg,var(--n900) 0%,var(--n700) 50%,rgba(26,79,130,.9) 100%);
+  display:flex;align-items:center;justify-content:center;
+}
+#login-screen.hidden{display:none}
+#login-screen::before{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(-55deg,transparent,transparent 20px,rgba(255,255,255,.02) 20px,rgba(255,255,255,.02) 21px);
+  pointer-events:none;
+}
+#login-screen::after{content:'⚓';position:absolute;right:60px;bottom:40px;font-size:180px;opacity:.04;pointer-events:none;line-height:1}
+.login-card{
+  background:var(--surf);border-radius:var(--rxl);
+  padding:44px 48px;width:420px;text-align:center;
+  box-shadow:0 24px 64px rgba(0,0,0,.45);
+  position:relative;z-index:1;
+}
+.login-logo{
+  width:56px;height:56px;border-radius:14px;
+  background:linear-gradient(135deg,var(--g400),var(--g200));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fds);font-size:24px;color:var(--n800);
+  margin:0 auto 18px;box-shadow:0 4px 20px rgba(217,130,0,.35);
+}
+.login-card h1{font-family:var(--fds);font-size:26px;color:var(--tx);margin-bottom:5px}
+.login-card .co{font-size:12px;color:var(--tx4);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em}
+.login-card p{font-size:13px;color:var(--tx3);margin-bottom:28px;line-height:1.6}
+#google-signin-btn{margin:0 auto;display:flex;justify-content:center}
+.login-no-gsi{
+  padding:12px 16px;border-radius:var(--r);
+  background:var(--surf2);border:1px solid var(--bdr2);
+  font-size:12px;color:var(--tx3);line-height:1.6;
+  margin-bottom:16px;
+}
+.login-no-gsi strong{color:var(--n600)}
+.login-hint{font-size:10px;color:var(--tx4);margin-top:16px;line-height:1.6}
+.login-hint a{color:var(--n500);text-decoration:none}
+.login-hint a:hover{text-decoration:underline}
+.login-err{font-size:12px;color:var(--r500);margin-top:12px;min-height:18px;font-weight:500}
+.login-spinner{font-size:12px;color:var(--tx3);margin-top:12px;display:none}
+
+/* ══════════════════════ APP SHELL ══════════════════════ */
+#app{display:flex;height:100vh;display:none}
+#app.visible{display:flex}
+
+/* SIDEBAR */
+#sidebar{width:var(--nw);flex-shrink:0;background:var(--n800);display:flex;flex-direction:column;overflow:hidden;box-shadow:2px 0 12px rgba(10,30,50,.18);position:relative;z-index:10}
+#sidebar::before{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(-55deg,transparent,transparent 20px,rgba(255,255,255,.025) 20px,rgba(255,255,255,.025) 21px)}
+.sb-brand{padding:16px 18px;background:var(--n900);display:flex;align-items:center;gap:11px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.08)}
+.sb-emblem{width:38px;height:38px;border-radius:10px;flex-shrink:0;background:linear-gradient(135deg,var(--g400),var(--g300));display:flex;align-items:center;justify-content:center;font-family:var(--fds);font-size:18px;color:var(--n800);box-shadow:0 0 20px rgba(217,130,0,.4)}
+.sb-brand-txt h1{font-size:13px;font-weight:600;color:#fff;letter-spacing:.01em}
+.sb-brand-txt p{font-size:10px;color:rgba(255,255,255,.4);margin-top:1px;text-transform:uppercase;letter-spacing:.05em}
+#nav{flex:1;overflow-y:auto;padding:8px 0}
+.nav-sec{padding:10px 16px 3px;font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3)}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 16px;cursor:pointer;font-size:12px;color:rgba(255,255,255,.55);border-left:2.5px solid transparent;transition:all .13s;user-select:none}
+.nav-item:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.85)}
+.nav-item.active{background:rgba(255,255,255,.1);color:#fff;border-left-color:var(--g300);font-weight:500}
+.nav-item.disabled,.nav-item.hidden-nav{opacity:.25;pointer-events:none}
+.nav-item.hidden-nav{display:none}
+.ni-icon{width:28px;height:28px;border-radius:7px;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:background .13s}
+.nav-item.active .ni-icon{background:rgba(245,166,35,.2)}
+.nav-item:hover .ni-icon{background:rgba(255,255,255,.12)}
+.ni-tag{margin-left:auto;font-size:9px;padding:1px 5px;border-radius:3px;border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.4);font-family:var(--fmono)}
+.nav-item.active .ni-tag{border-color:rgba(245,166,35,.5);color:var(--g200)}
+.ni-live{width:6px;height:6px;border-radius:50%;background:#4DC9A0;margin-left:auto;box-shadow:0 0 8px #4DC9A0}
+
+/* User info in sidebar */
+.sb-user{padding:10px 16px;border-top:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:9px;flex-shrink:0}
+.sb-avatar{width:32px;height:32px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0;object-fit:cover;background:var(--n600);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff}
+.sb-user-info{flex:1;min-width:0}
+.sb-user-name{font-size:11px;color:rgba(255,255,255,.8);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sb-user-role{font-size:9px;color:rgba(255,255,255,.4);margin-top:1px}
+.sb-signout{width:22px;height:22px;border-radius:5px;background:rgba(255,255,255,.08);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;color:rgba(255,255,255,.4);transition:all .15s;padding:0;flex-shrink:0}
+.sb-signout:hover{background:rgba(255,255,255,.2);color:#fff}
+
+.sb-foot{padding:10px 16px;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.sb-fdot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.2);flex-shrink:0;transition:all .3s}
+.sb-fdot.on{background:#4DC9A0;box-shadow:0 0 9px #4DC9A0}
+.sb-fdot.warn{background:var(--g300);animation:blink 1.2s infinite}
+.sb-fdot.err{background:#E86060}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+#sb-status{font-size:10px;color:rgba(255,255,255,.4);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* MAIN */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+#topbar{height:var(--hh);padding:0 22px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;background:var(--surf);border-bottom:1px solid var(--bdr);box-shadow:0 2px 8px rgba(10,30,50,.06)}
+.tb-l{display:flex;align-items:center;gap:12px}
+#ptitle{font-family:var(--fds);font-size:22px;color:var(--tx);font-weight:400}
+#pbadge{font-size:9px;padding:3px 9px;border-radius:12px;background:var(--ac-lt);border:1px solid rgba(26,79,130,.2);color:var(--n600);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.tb-r{display:flex;align-items:center;gap:7px}
+#sync-pill{display:flex;align-items:center;gap:6px;padding:5px 11px;border-radius:20px;background:var(--surf2);border:1px solid var(--bdr);font-size:11px;color:var(--tx3)}
+.sp-dot{width:6px;height:6px;border-radius:50%;background:var(--n200);flex-shrink:0;transition:all .3s}
+.sp-dot.on{background:#1A9E6A;box-shadow:0 0 7px #1A9E6A}
+.sp-dot.busy{background:var(--g400);animation:blink .8s infinite}
+.sp-dot.err{background:var(--r500)}
+
+/* ROLE BADGE */
+.role-badge{font-size:9px;padding:2px 8px;border-radius:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.role-admin{background:#F0E6FA;color:#6B2FA0;border:1px solid rgba(107,47,160,.2)}
+.role-manager{background:var(--n100);color:var(--n600);border:1px solid rgba(26,79,130,.2)}
+.role-staff{background:var(--t100);color:var(--t600);border:1px solid rgba(15,128,112,.2)}
+.role-viewer{background:var(--surf3);color:var(--tx3);border:1px solid var(--bdr2)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;font-size:12px;border-radius:var(--r);border:1px solid var(--bdr2);background:var(--surf);color:var(--tx2);cursor:pointer;font-family:var(--fui);transition:all .13s;white-space:nowrap;font-weight:400;box-shadow:0 1px 3px rgba(10,30,50,.07)}
+.btn:hover{background:var(--surf3);border-color:var(--bdr3);color:var(--tx)}
+.btn:active{transform:scale(.98);box-shadow:none}
+.btn-navy{background:var(--n700);color:#fff;border-color:var(--n700);box-shadow:0 2px 8px var(--ac-glow)}
+.btn-navy:hover{background:var(--n800);color:#fff}
+.btn-gold{background:linear-gradient(135deg,var(--g500),var(--g300));color:#fff;border-color:var(--g400);font-weight:600;box-shadow:0 2px 10px rgba(217,130,0,.3)}
+.btn-gold:hover{background:linear-gradient(135deg,var(--g400),var(--g200));color:var(--n800)}
+.btn-sheets{background:linear-gradient(135deg,#1a5c32,#228B4A);color:#fff;border-color:#1a5c32;font-weight:500}
+.btn-sheets:hover{background:linear-gradient(135deg,#228B4A,#2AAD5C);color:#fff}
+.btn-teal{background:var(--t400);color:#fff;border-color:var(--t400)}
+.btn-teal:hover{background:var(--t600)}
+.btn-danger{background:var(--r100);color:var(--r500);border-color:rgba(184,50,50,.25)}
+.btn-danger:hover{background:var(--r500);color:#fff}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-xs{padding:3px 8px;font-size:10px}
+
+/* CONTENT */
+#content{flex:1;overflow-y:auto;position:relative}
+.view{display:none}
+.view.active{display:block;animation:fadein .2s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* ══════════════════════ DASHBOARD ══════════════════════ */
+#view-dashboard{padding:24px;overflow-y:auto;max-height:calc(100vh - var(--hh))}
+.dash-hero{background:linear-gradient(135deg,var(--n700) 0%,var(--n600) 70%,rgba(26,79,130,.7) 100%);border-radius:var(--rxl);padding:26px 30px;margin-bottom:20px;overflow:hidden;position:relative;box-shadow:var(--shadow-lg)}
+.dash-hero::after{content:'⚓';position:absolute;right:28px;bottom:10px;font-size:78px;opacity:.07;pointer-events:none;line-height:1}
+.dash-hero h2{font-family:var(--fds);font-size:26px;color:#fff;margin-bottom:4px}
+.dash-hero p{font-size:12px;color:rgba(255,255,255,.7);max-width:460px;line-height:1.6}
+.dash-links{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:22px}
+.stat-card{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:14px 16px;box-shadow:var(--shadow);position:relative;overflow:hidden;transition:all .18s}
+.stat-card:hover{transform:translateY(-1px);box-shadow:var(--shadow-lg)}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--sc,var(--n500));border-radius:var(--rl) var(--rl) 0 0}
+.stat-card:nth-child(1){--sc:linear-gradient(90deg,var(--n600),var(--n400))}
+.stat-card:nth-child(2){--sc:linear-gradient(90deg,var(--t400),var(--t200))}
+.stat-card:nth-child(3){--sc:linear-gradient(90deg,var(--g400),var(--g200))}
+.stat-card:nth-child(4){--sc:linear-gradient(90deg,var(--pu500),#C084FC)}
+.sc-lbl{font-size:9px;color:var(--tx4);text-transform:uppercase;letter-spacing:.09em;font-weight:600;margin-bottom:6px}
+.sc-val{font-family:var(--fds);font-size:32px;color:var(--tx);line-height:1;letter-spacing:-.02em}
+.sc-sub{font-size:10px;color:var(--tx4);margin-top:3px}
+.sec-hd{font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.09em;margin-bottom:11px}
+.wf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.wf-card{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:13px 15px;cursor:pointer;transition:all .15s;box-shadow:var(--shadow)}
+.wf-card:hover{border-color:var(--n400);background:var(--ac-lt);transform:translateY(-1px);box-shadow:var(--shadow-lg)}
+.wf-card.locked{opacity:.35;pointer-events:none}
+.wf-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px}
+.wf-card h4{font-size:12px;font-weight:600;color:var(--tx)}
+.wf-card p{font-size:10px;color:var(--tx4);line-height:1.4}
+.wf-tag{font-size:9px;padding:2px 6px;border-radius:3px;border:1px solid;font-family:var(--fmono)}
+.wf-tag.live{background:var(--ac-lt);color:var(--n600);border-color:rgba(26,79,130,.25)}
+.wf-tag.soon{background:var(--surf3);color:var(--tx4);border-color:var(--bdr)}
+.wf-arr{font-size:14px;color:var(--n500);opacity:0;transition:all .15s;display:block;margin-top:5px}
+.wf-card:hover .wf-arr{opacity:1;transform:translateX(3px)}
+
+/* ══════════════════════ MODULE FORM ══════════════════════ */
+.mod-wrap{padding:22px;overflow-y:auto;max-height:calc(100vh - var(--hh))}
+.mod-head{background:linear-gradient(135deg,var(--n700),var(--n600));border-radius:var(--rl);padding:18px 22px;margin-bottom:18px;display:flex;align-items:flex-start;justify-content:space-between;box-shadow:var(--shadow-lg)}
+.mod-head-l h2{font-family:var(--fds);font-size:21px;color:#fff;font-weight:400}
+.mod-head-l p{font-size:12px;color:rgba(255,255,255,.65);margin-top:3px;line-height:1.5}
+.mod-badge{font-family:var(--fmono);font-size:10px;color:rgba(255,255,255,.7);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);padding:6px 11px;border-radius:var(--r);display:flex;align-items:center;gap:6px;flex-shrink:0}
+.mod-badge .dot{width:5px;height:5px;border-radius:50%;background:var(--g300);box-shadow:0 0 7px var(--g300)}
+.map-bar{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:11px 14px;margin-bottom:16px;box-shadow:var(--shadow)}
+.map-bar-ttl{font-size:9px;font-weight:600;color:var(--tx4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip{font-size:10px;padding:2px 7px;border-radius:4px;background:var(--surf2);border:1px solid var(--bdr);color:var(--tx3);display:flex;align-items:center;gap:4px}
+.chip em{color:var(--n600);font-style:normal;font-family:var(--fmono);font-size:9px;font-weight:600}
+.form-section{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:15px 17px;margin-bottom:12px;box-shadow:var(--shadow)}
+.form-section-hd{font-size:10px;font-weight:600;color:var(--n700);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;padding-bottom:7px;border-bottom:2px solid var(--n100);display:flex;align-items:center;gap:6px}
+.fg-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.fg{display:flex;flex-direction:column;gap:4px}
+.fg.full{grid-column:1/-1}
+label.fl{font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;display:block}
+label.fl .req{color:var(--r500)}
+.fg input,.fg select,.fg textarea{padding:8px 10px;font-size:12px;border:1px solid var(--bdr2);border-radius:var(--r);background:var(--surf2);color:var(--tx);font-family:var(--fui);transition:all .14s;outline:none}
+.fg input:hover,.fg select:hover,.fg textarea:hover{border-color:var(--bdr3);background:var(--surf)}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--n500);background:var(--surf);box-shadow:0 0 0 3px rgba(26,79,130,.1)}
+.fg select option{background:var(--surf)}
+.fg textarea{resize:vertical;line-height:1.6}
+.fg .hint{font-size:10px;color:var(--tx4)}
+.fg .cc{font-size:10px;color:var(--tx4);text-align:right;font-family:var(--fmono);transition:color .2s}
+.fg .cc.warn{color:var(--g400);font-weight:600}
+.file-row{display:flex;align-items:center;gap:7px}
+.file-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 10px;font-size:11px;border:1.5px dashed var(--bdr3);border-radius:var(--r);color:var(--tx3);cursor:pointer;background:var(--surf2);transition:all .14s;font-family:var(--fui)}
+.file-btn:hover{border-color:var(--n500);color:var(--n600);background:var(--ac-lt)}
+.file-ok{font-size:10px;color:var(--gr500);font-weight:600}
+.fsz{font-size:10px;color:var(--tx4);margin-top:2px}
+
+/* ITEMS TABLE — multi-line textarea for item name */
+.items-section{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:15px 17px;margin-bottom:12px;box-shadow:var(--shadow)}
+.items-hint{font-size:10px;color:var(--tx4);margin-bottom:8px;font-style:italic}
+table.items-tbl{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:8px}
+table.items-tbl th{padding:7px 8px;background:var(--n700);color:#fff;font-weight:600;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.04em;border:1px solid var(--n600)}
+table.items-tbl td{border:1px solid var(--bdr);vertical-align:top}
+table.items-tbl td.sr-cell{width:36px;text-align:center;color:var(--tx4);padding:8px 5px;font-family:var(--fmono);font-size:11px;vertical-align:middle}
+table.items-tbl td textarea.item-name-ta{
+  width:100%;padding:6px 8px;border:none;
+  background:transparent;font-size:11px;
+  color:var(--tx);font-family:var(--fui);outline:none;
+  resize:none;min-height:36px;line-height:1.5;
+  overflow:hidden;
+}
+table.items-tbl td input.item-inp{
+  width:100%;padding:6px 8px;border:none;
+  background:transparent;font-size:11px;
+  color:var(--tx);font-family:var(--fui);outline:none;
+}
+table.items-tbl tr:nth-child(even) td{background:var(--surf2)}
+table.items-tbl td textarea:focus,table.items-tbl td input:focus{background:var(--ac-lt)}
+table.items-tbl td.del-cell{width:28px;text-align:center;vertical-align:middle}
+table.items-tbl td.del-cell button{width:20px;height:20px;border-radius:4px;border:none;background:transparent;color:var(--r200);cursor:pointer;font-size:12px;transition:all .15s;padding:0;display:flex;align-items:center;justify-content:center}
+table.items-tbl td.del-cell button:hover{background:var(--r100);color:var(--r500)}
+.add-row-link{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--n600);cursor:pointer;padding:3px 0;font-weight:500}
+.add-row-link:hover{text-decoration:underline;color:var(--n700)}
+.form-actions{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:13px 17px;display:flex;gap:8px;flex-wrap:wrap;box-shadow:var(--shadow)}
+
+/* ══════════════════════ MAIN SHEET ══════════════════════ */
+.sheet-bar{padding:9px 18px;background:var(--surf);border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:8px;flex-wrap:wrap;box-shadow:0 1px 4px rgba(10,30,50,.06)}
+.sheet-bar input{height:31px;padding:0 10px;font-size:12px;border:1px solid var(--bdr2);border-radius:var(--r);background:var(--surf2);color:var(--tx);font-family:var(--fui);width:190px;outline:none}
+.sheet-bar input:focus{border-color:var(--n500);background:var(--surf)}
+.row-info{font-size:10px;color:var(--tx4);margin-left:auto;font-family:var(--fmono)}
+.sheet-wrap{overflow:auto;max-height:calc(100vh - var(--hh) - 52px)}
+table.ms{border-collapse:collapse;font-size:11px;white-space:nowrap;width:100%}
+table.ms th{padding:7px 10px;background:var(--n700);color:#fff;font-weight:600;font-size:10px;position:sticky;top:0;z-index:2;border:1px solid rgba(255,255,255,.1);text-transform:uppercase;letter-spacing:.04em;cursor:pointer;user-select:none}
+table.ms th:hover{background:var(--n800)}
+table.ms td{padding:5px 10px;border:1px solid var(--bdr);color:var(--tx2);max-width:170px;overflow:hidden;text-overflow:ellipsis}
+table.ms tr:nth-child(even) td{background:var(--surf2)}
+table.ms tr:hover td{background:var(--n50)}
+table.ms tr.sel td{background:var(--ac-lt);border-color:rgba(26,79,130,.25)}
+.sticky-col{position:sticky;left:0;z-index:1;background:var(--surf) !important;font-weight:600;color:var(--tx4) !important;font-family:var(--fmono)}
+.ca{border-left:2.5px solid var(--n400)}
+.cb{border-left:2.5px solid var(--t400)}
+.cc-col{border-left:2.5px solid var(--g400)}
+.cd{border-left:2.5px solid var(--n300)}
+
+/* ══════════════════════ USER MANAGEMENT ══════════════════════ */
+.users-wrap{padding:22px;overflow-y:auto;max-height:calc(100vh - var(--hh))}
+.users-card{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px}
+.users-card-hd{padding:13px 18px;background:var(--surf2);border-bottom:1px solid var(--bdr);font-size:12px;font-weight:600;color:var(--tx2);display:flex;align-items:center;justify-content:space-between}
+table.users-tbl{width:100%;border-collapse:collapse;font-size:12px}
+table.users-tbl th{padding:8px 14px;background:var(--n700);color:#fff;font-weight:600;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.05em;border:1px solid var(--n600)}
+table.users-tbl td{padding:8px 14px;border:1px solid var(--bdr);color:var(--tx2)}
+table.users-tbl tr:hover td{background:var(--surf2)}
+.add-user-form{padding:14px 18px;background:var(--surf2);border-top:1px solid var(--bdr)}
+.add-user-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:8px;align-items:end}
+.auf{display:flex;flex-direction:column;gap:3px}
+.auf label{font-size:9px;font-weight:600;color:var(--tx4);text-transform:uppercase;letter-spacing:.06em}
+.auf input,.auf select{padding:7px 9px;font-size:12px;border:1px solid var(--bdr2);border-radius:var(--r);background:var(--surf);color:var(--tx);font-family:var(--fui);outline:none}
+.auf input:focus,.auf select:focus{border-color:var(--n500)}
+.status-active{color:var(--gr500);font-weight:500}
+.status-inactive{color:var(--r500);font-weight:500}
+
+/* ══════════════════════ ACTION LOG ══════════════════════ */
+.log-wrap{padding:22px;overflow-y:auto;max-height:calc(100vh - var(--hh))}
+table.log-tbl{width:100%;border-collapse:collapse;font-size:11px;box-shadow:var(--shadow)}
+table.log-tbl th{padding:8px 11px;background:var(--n700);border:1px solid var(--n600);color:#fff;font-weight:600;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.05em}
+table.log-tbl td{padding:6px 11px;border:1px solid var(--bdr);color:var(--tx2)}
+table.log-tbl tr:nth-child(even) td{background:var(--surf2)}
+table.log-tbl tr:hover td{background:var(--n50)}
+.badge-ok{display:inline-block;padding:2px 7px;border-radius:4px;background:var(--gr100);color:var(--gr500);font-size:10px;font-weight:600}
+.badge-err{display:inline-block;padding:2px 7px;border-radius:4px;background:var(--r100);color:var(--r500);font-size:10px;font-weight:600}
+
+/* ══════════════════════ SETTINGS ══════════════════════ */
+#view-settings{overflow:hidden;max-height:calc(100vh - var(--hh));position:relative}
+#lock-screen{position:absolute;inset:0;z-index:50;background:rgba(10,30,50,.72);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center}
+#lock-screen.hidden{display:none}
+.lock-box{background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--rxl);padding:34px 38px;width:350px;text-align:center;box-shadow:var(--shadow-lg);animation:fadein .25s ease}
+.lock-icon{font-size:42px;margin-bottom:14px;display:block}
+.lock-box h3{font-family:var(--fds);font-size:22px;color:var(--tx);margin-bottom:6px}
+.lock-box p{font-size:12px;color:var(--tx3);margin-bottom:20px;line-height:1.6}
+.lock-box input{width:100%;padding:10px 13px;font-size:15px;letter-spacing:.25em;border:1.5px solid var(--bdr2);border-radius:var(--r);background:var(--surf2);color:var(--tx);font-family:var(--fmono);text-align:center;outline:none;margin-bottom:10px;transition:all .14s}
+.lock-box input:focus{border-color:var(--n500);box-shadow:0 0 0 3px rgba(26,79,130,.1);background:var(--surf)}
+.lock-box input.shake{animation:shake .35s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.lock-err{font-size:11px;color:var(--r500);height:18px;margin-bottom:8px}
+.lock-hint{font-size:10px;color:var(--tx4);margin-top:11px;line-height:1.6}
+.lock-hint strong{color:var(--n600)}
+.settings-body{padding:22px;overflow-y:auto;max-height:calc(100vh - var(--hh))}
+.settings-hd{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px}
+.settings-hd-l h2{font-family:var(--fds);font-size:22px;color:var(--tx)}
+.settings-hd-l p{font-size:12px;color:var(--tx3);margin-top:2px}
+.unlock-badge{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--gr500);background:var(--gr100);border:1px solid rgba(26,122,66,.25);padding:4px 11px;border-radius:20px;font-weight:500}
+.sheets-jump{background:linear-gradient(135deg,rgba(26,92,50,.08),rgba(34,139,74,.05));border:1.5px solid rgba(34,139,74,.3);border-radius:var(--rl);padding:15px 18px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:var(--shadow)}
+.sheets-jump-info h4{font-size:13px;font-weight:600;color:var(--tx);margin-bottom:2px;display:flex;align-items:center;gap:6px}
+.sheets-jump-info p{font-size:11px;color:var(--tx3)}
+.url-pill{font-family:var(--fmono);font-size:10px;color:var(--tx4);background:var(--surf2);border:1px solid var(--bdr);padding:4px 9px;border-radius:4px;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:340px;display:block}
+.jump-btns{display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+.settings-card{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:16px 18px;margin-bottom:12px;box-shadow:var(--shadow)}
+.settings-card h3{font-size:12px;font-weight:600;color:var(--tx2);display:flex;align-items:center;gap:7px;margin-bottom:13px}
+.s-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:11px}
+.sf{display:flex;flex-direction:column;gap:3px}
+.sf label{font-size:9px;font-weight:600;color:var(--tx4);text-transform:uppercase;letter-spacing:.07em}
+.sf input{padding:8px 10px;font-size:12px;border:1px solid var(--bdr2);border-radius:var(--r);background:var(--surf2);color:var(--tx);font-family:var(--fui);outline:none;transition:all .14s}
+.sf input:focus{border-color:var(--n500);background:var(--surf);box-shadow:0 0 0 3px rgba(26,79,130,.1)}
+.sf .hint{font-size:10px;color:var(--tx4)}
+.sf .hint code{background:var(--surf3);padding:1px 4px;border-radius:3px;font-family:var(--fmono);font-size:9px}
+.pwd-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:end}
+.pwd-row .sf input{font-family:var(--fmono);letter-spacing:.1em}
+.pwd-note{background:rgba(217,130,0,.07);border:1px solid rgba(217,130,0,.22);border-radius:var(--r);padding:9px 12px;font-size:11px;color:var(--tx3);margin-top:9px;line-height:1.6}
+.sysinfo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.si-item .si-lbl{font-size:9px;color:var(--tx4);text-transform:uppercase;letter-spacing:.07em;margin-bottom:2px}
+.si-item .si-val{font-family:var(--fmono);color:var(--tx);font-size:12px}
+.danger-zone{border-color:rgba(184,50,50,.22) !important}
+.danger-zone h3{color:var(--r500) !important}
+
+/* PERMISSIONS TABLE */
+.perm-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:4px}
+.perm-table th{padding:6px 10px;background:var(--surf3);border:1px solid var(--bdr);font-size:10px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.05em}
+.perm-table td{padding:6px 10px;border:1px solid var(--bdr);color:var(--tx2)}
+.perm-table tr:nth-child(even) td{background:var(--surf2)}
+.perm-yes{color:var(--gr500);font-weight:600;font-size:13px}
+.perm-no{color:var(--r200);font-size:13px}
+.perm-ro{color:var(--g400);font-size:11px;font-weight:500}
+
+/* EMPTY */
+.empty{text-align:center;padding:50px 20px;color:var(--tx4)}
+.empty-icon{font-size:36px;margin-bottom:11px;display:block;opacity:.45}
+.empty h3{font-size:14px;font-weight:500;color:var(--tx3);margin-bottom:4px}
+
+/* TOAST */
+#toast{position:fixed;bottom:22px;right:22px;padding:10px 16px;border-radius:var(--rl);font-size:12px;font-weight:500;opacity:0;transition:opacity .25s;pointer-events:none;z-index:9999;max-width:340px;box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:7px}
+#toast.show{opacity:1}
+#toast.ok{background:var(--gr500);color:#fff}
+#toast.err{background:var(--r500);color:#fff}
+#toast.warn{background:var(--g500);color:#fff}
+#toast.info{background:var(--n600);color:#fff}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════
+     LOGIN SCREEN
+═══════════════════════════════════════════════════ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">SP</div>
+    <h1>IMSE BVBA</h1>
+    <div class="co">Spare Parts Management System</div>
+    <p>Sign in with your authorised Google account to access the system. Contact your Admin if you need access.</p>
+    <div id="google-signin-btn"></div>
+    <div id="login-no-gsi" class="login-no-gsi" style="display:none">
+      <strong>Setup required:</strong> Add your Google OAuth Client ID in Settings to enable Google Sign-In.<br>
+      <small>Go to Settings → paste your Client ID → save.</small>
+    </div>
+    <div class="login-err" id="login-err"></div>
+    <div class="login-spinner" id="login-spinner">⏳ Verifying your account…</div>
+    <div class="login-hint">
+      Your login is verified against the authorised users list.<br>
+      <a href="https://console.cloud.google.com/apis/credentials" target="_blank">Create OAuth credentials →</a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     MAIN APP
+═══════════════════════════════════════════════════ -->
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div class="sb-brand">
+      <div class="sb-emblem">SP</div>
+      <div class="sb-brand-txt"><h1>Spare Parts System</h1><p>IMSE BVBA</p></div>
+    </div>
+
+    <!-- USER INFO -->
+    <div class="sb-user">
+      <div class="sb-avatar" id="sb-avatar">?</div>
+      <div class="sb-user-info">
+        <div class="sb-user-name" id="sb-uname">—</div>
+        <div class="sb-user-role" id="sb-urole">—</div>
+      </div>
+      <button class="sb-signout" onclick="signOut()" title="Sign out">⏏</button>
+    </div>
+
+    <div id="nav">
+      <div class="nav-sec">Overview</div>
+      <div class="nav-item active" onclick="go(this,'dashboard')" id="nav-dashboard"><div class="ni-icon">📊</div>Dashboard<div class="ni-live" id="live-dot" style="display:none"></div></div>
+      <div class="nav-item" onclick="go(this,'mainsheet')" id="nav-mainsheet"><div class="ni-icon">📋</div>Main Sheet</div>
+      <div class="nav-item" onclick="go(this,'synclog')" id="nav-synclog"><div class="ni-icon">🔄</div>Sync Log</div>
+      <div class="nav-item" onclick="go(this,'actionlog')" id="nav-actionlog"><div class="ni-icon">📜</div>Action Log</div>
+      <div class="nav-item" onclick="go(this,'users')" id="nav-users"><div class="ni-icon">👥</div>User Management</div>
+      <div class="nav-item" onclick="go(this,'settings')" id="nav-settings"><div class="ni-icon">⚙️</div>Settings<span id="lock-nav" style="margin-left:auto;font-size:12px;opacity:.6">🔒</span></div>
+      <div class="nav-sec" style="margin-top:6px">Modules</div>
+      <div class="nav-item" onclick="go(this,'modA')" id="nav-modA"><div class="ni-icon">📥</div>Inward Inquiry<span class="ni-tag">Tab A</span></div>
+      <div class="nav-item disabled" id="nav-modC"><div class="ni-icon">📤</div>Outward Inquiry<span class="ni-tag">Tab C</span></div>
+      <div class="nav-item disabled"><div class="ni-icon">💰</div>Inward Quotation<span class="ni-tag">Tab D</span></div>
+      <div class="nav-item disabled"><div class="ni-icon">📝</div>Outward Quotation<span class="ni-tag">Tab E</span></div>
+      <div class="nav-item disabled"><div class="ni-icon">🛒</div>Inward PO<span class="ni-tag">Tab F</span></div>
+      <div class="nav-item disabled"><div class="ni-icon">📦</div>Outward PO<span class="ni-tag">Tab G</span></div>
+      <div class="nav-item disabled"><div class="ni-icon">✅</div>Order Confirm<span class="ni-tag">Tab H</span></div>
+      <div class="nav-item disabled"><div class="ni-icon">🧾</div>Tax Invoice<span class="ni-tag">Tab Q</span></div>
+    </div>
+
+    <div class="sb-foot">
+      <div class="sb-fdot" id="sb-fdot"></div>
+      <span id="sb-status">Not connected</span>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div id="main">
+    <div id="topbar">
+      <div class="tb-l">
+        <span id="ptitle">Dashboard</span>
+        <span id="pbadge">Overview</span>
+      </div>
+      <div class="tb-r">
+        <span class="role-badge" id="role-badge-top"></span>
+        <div id="sync-pill"><div class="sp-dot" id="sp-dot"></div><span id="sp-txt">Not synced</span></div>
+        <button class="btn btn-sheets btn-sm" onclick="openSheet()">📊 Open Sheet</button>
+        <button class="btn btn-sm" onclick="refreshCurrent()">↻ Refresh</button>
+        <button class="btn btn-navy btn-sm" onclick="syncAll()">⬆ Sync Drive</button>
+      </div>
+    </div>
+
+    <div id="content">
+
+      <!-- DASHBOARD -->
+      <div id="view-dashboard" class="view active">
+        <div style="padding:22px;overflow-y:auto;max-height:calc(100vh - var(--hh))">
+          <div class="dash-hero">
+            <h2>Spare Parts Workflow</h2>
+            <p>Alfa Laval distribution management — end-to-end tracking from inquiry to invoice, synced to Google Sheets.</p>
+            <div class="dash-links">
+              <button class="btn btn-sheets btn-sm" onclick="openSheet()">📊 Open Google Sheet</button>
+              <button class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.25)" onclick="openFolder()">📁 Drive Folder</button>
+              <button class="btn btn-sm" style="background:rgba(245,166,35,.2);color:var(--g200);border-color:rgba(245,166,35,.3)" onclick="syncAll()">⬆ Sync Now</button>
+            </div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-card"><div class="sc-lbl">Inward Inquiries</div><div class="sc-val" id="stat-inq">—</div><div class="sc-sub">Tab A records</div></div>
+            <div class="stat-card"><div class="sc-lbl">Main Sheet Rows</div><div class="sc-val" id="stat-main">—</div><div class="sc-sub">Synced records</div></div>
+            <div class="stat-card"><div class="sc-lbl">Drive Status</div><div class="sc-val" id="stat-conn" style="font-size:14px;margin-top:5px">—</div><div class="sc-sub" id="stat-sub">Configure in Settings</div></div>
+            <div class="stat-card"><div class="sc-lbl">System Users</div><div class="sc-val" id="stat-users">—</div><div class="sc-sub">Authorised accounts</div></div>
+          </div>
+          <div class="sec-hd">Workflow Modules</div>
+          <div class="wf-grid" id="wf-grid"></div>
+        </div>
+      </div>
+
+      <!-- MAIN SHEET -->
+      <div id="view-mainsheet" class="view">
+        <div class="sheet-bar">
+          <input type="text" id="ms-search" placeholder="🔍  Search all columns…" oninput="filterMS()">
+          <button class="btn btn-sm" onclick="loadMainSheet()">↻ Refresh</button>
+          <button class="btn btn-sheets btn-sm" onclick="openSheet()">📊 Google Sheet</button>
+          <button class="btn btn-sm" id="btn-export-csv" onclick="exportCSV()">↓ CSV</button>
+          <span class="row-info" id="ms-count">0 records</span>
+        </div>
+        <div class="sheet-wrap">
+          <table class="ms" id="ms-tbl">
+            <thead id="ms-head"></thead>
+            <tbody id="ms-body">
+              <tr><td colspan="38"><div class="empty"><span class="empty-icon">📋</span><h3>No data loaded</h3><p>Click Refresh to load from Google Sheets</p></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- MODULE A — 23 fields -->
+      <div id="view-modA" class="view">
+        <div class="mod-wrap">
+          <div class="mod-head">
+            <div class="mod-head-l"><h2>Inward Inquiry</h2><p>Tab A — Format No. 1 · 23 fields · Auto-syncs to Google Sheets Main Sheet</p></div>
+            <div class="mod-badge"><div class="dot"></div>FORMAT NO. 1</div>
+          </div>
+          <div class="map-bar">
+            <div class="map-bar-ttl">Main Sheet Column Mapping (37 Columns)</div>
+            <div class="chips">
+              <div class="chip">Vendor Code <em>Col A</em></div>
+              <div class="chip">Inquiry Received At+Date <em>Col B</em></div>
+              <div class="chip">Buyer Co.+End User <em>Col C</em></div>
+              <div class="chip">Inquiry No.+Date+Doc <em>Col D</em></div>
+              <div class="chip">Drawing <em>Col E</em></div>
+              <div class="chip">Desc+Maker+Serial+Mfg <em>Col F</em></div>
+              <div class="chip">Vessel+IMO <em>Col G</em></div>
+              <div class="chip">Port <em>Col H</em></div>
+              <div class="chip">Currency <em>Col I</em></div>
+              <div class="chip">Address <em>Col W</em></div>
+              <div class="chip">Contact+Phone+WA+Emails <em>Col X</em></div>
+              <div class="chip">GST No. <em>Col AC</em></div>
+            </div>
+          </div>
+          <form id="form-a" onsubmit="return false">
+            <!-- Section 1 -->
+            <div class="form-section">
+              <div class="form-section-hd"><span>📬</span>Inquiry Details</div>
+              <div class="fg-grid">
+                <div class="fg full"><label class="fl">Inquiry Received At (Email ID, Whatsapp, Other) <span class="req">*</span></label><input type="text" id="a-rcvdat" placeholder="e.g. orders@co.com / WhatsApp +31 6 00 000 / Phone" maxlength="50" oninput="cc(this,'a-cc1',50)"><span class="cc" id="a-cc1">0 / 50</span></div>
+                <div class="fg"><label class="fl">Inquiry Received Date <span class="req">*</span></label><input type="date" id="a-rcvddate"></div>
+                <div class="fg"><label class="fl">Inquiry No. <span class="req">*</span></label><input type="text" id="a-inqno" placeholder="INQ-2024-001" maxlength="30" oninput="cc(this,'a-cc4',30)"><span class="cc" id="a-cc4">0 / 30</span></div>
+                <div class="fg"><label class="fl">Inquiry Date</label><input type="date" id="a-inqdate"></div>
+                <div class="fg"><label class="fl">Currency</label><select id="a-currency"><option value="">Select…</option><option>USD</option><option>EUR</option><option>GBP</option><option>INR</option><option>AED</option><option>SGD</option><option>JPY</option><option>NOK</option><option>SEK</option></select></div>
+              </div>
+            </div>
+            <!-- Section 2 -->
+            <div class="form-section">
+              <div class="form-section-hd"><span>🏢</span>Buyer / Company Information</div>
+              <div class="fg-grid">
+                <div class="fg full"><label class="fl">Buyer Company Name &amp; End User Name / Ship Name <span class="req">*</span></label><input type="text" id="a-company" placeholder="Company Name — End User or Ship Name" maxlength="70" oninput="cc(this,'a-cc2',70)"><span class="cc" id="a-cc2">0 / 70</span></div>
+                <div class="fg"><label class="fl">Buyer Assigned Code</label><input type="text" id="a-code" placeholder="10-digit code" maxlength="10" oninput="cc(this,'a-cc10',10)"><span class="cc" id="a-cc10">0 / 10</span></div>
+                <div class="fg"><label class="fl">GST No.</label><input type="text" id="a-gstno" placeholder="e.g. 27AAAAA0000A1Z5" maxlength="10" oninput="cc(this,'a-cc9',10)"><span class="cc" id="a-cc9">0 / 10</span></div>
+                <div class="fg full"><label class="fl">Buyer Invoicing Address</label><textarea id="a-address" placeholder="Full invoicing address…" maxlength="200" oninput="cc(this,'a-cc7',200)" rows="3"></textarea><span class="cc" id="a-cc7">0 / 200</span></div>
+                <div class="fg"><label class="fl">Buyer Contact Person</label><input type="text" id="a-contact" placeholder="Name &amp; Designation" maxlength="40"></div>
+                <div class="fg"><label class="fl">Buyer Phone No. (With Country code)</label><input type="tel" id="a-phone" placeholder="+31 10 000 0000" maxlength="15"></div>
+                <div class="fg"><label class="fl">Buyer Whatsapp Phone No. (With Country code)</label><input type="tel" id="a-whatsapp" placeholder="+31 6 00 000 000" maxlength="15"></div>
+                <div class="fg full"><label class="fl">Buyer Email IDs separated by commas</label><input type="text" id="a-emails" placeholder="buyer@co.com, finance@co.com, ops@co.com…" maxlength="200" oninput="cc(this,'a-cc8',200)"><span class="cc" id="a-cc8">0 / 200</span></div>
+              </div>
+            </div>
+            <!-- Section 3 -->
+            <div class="form-section">
+              <div class="form-section-hd"><span>⚙️</span>Equipment Details</div>
+              <div class="fg-grid">
+                <div class="fg"><label class="fl">Maker</label><input type="text" id="a-maker" placeholder="Manufacturer" maxlength="13" oninput="cc(this,'a-cc11',13)"><span class="cc" id="a-cc11">0 / 13</span></div>
+                <div class="fg"><label class="fl">Equipment Serial No.</label><input type="text" id="a-eqserial" placeholder="Serial number" maxlength="15" oninput="cc(this,'a-cc12',15)"><span class="cc" id="a-cc12">0 / 15</span></div>
+                <div class="fg"><label class="fl">Equipment Manufacture Date</label><input type="text" id="a-eqmfg" placeholder="2018 / Jan-2018" maxlength="13" oninput="cc(this,'a-cc13',13)"><span class="cc" id="a-cc13">0 / 13</span></div>
+                <div class="fg"><label class="fl">Description</label><input type="text" id="a-desc" placeholder="Part or equipment description" maxlength="50" oninput="cc(this,'a-cc3',50)"><span class="cc" id="a-cc3">0 / 50</span></div>
+              </div>
+            </div>
+            <!-- Section 4 -->
+            <div class="form-section">
+              <div class="form-section-hd"><span>🚢</span>Vessel &amp; Shipping</div>
+              <div class="fg-grid">
+                <div class="fg"><label class="fl">Vessel Name</label><input type="text" id="a-vessel" placeholder="MV Vessel Name" maxlength="20" oninput="cc(this,'a-cc5',20)"><span class="cc" id="a-cc5">0 / 20</span></div>
+                <div class="fg"><label class="fl">Vessel IMO No.</label><input type="text" id="a-imo" placeholder="1234567" maxlength="7"><span class="hint">7 digits only</span></div>
+                <div class="fg"><label class="fl">Port of Delivery</label><input type="text" id="a-port" placeholder="Rotterdam" maxlength="20" oninput="cc(this,'a-cc6',20)"><span class="cc" id="a-cc6">0 / 20</span></div>
+              </div>
+            </div>
+            <!-- Section 5 -->
+            <div class="form-section">
+              <div class="form-section-hd"><span>📎</span>Documents</div>
+              <div class="fg-grid">
+                <div class="fg"><label class="fl">Inquiry Document (PDF)</label><div class="file-row"><div class="file-btn" onclick="pickFile('a-inqdoc','a-inqdoc-ok')">📎 Attach PDF</div><span class="file-ok" id="a-inqdoc-ok"></span></div><div class="fsz">Max 1 MB</div></div>
+                <div class="fg"><label class="fl">Drawing (PDF)</label><div class="file-row"><div class="file-btn" onclick="pickFile('a-drw','a-drw-ok')">📎 Attach PDF</div><span class="file-ok" id="a-drw-ok"></span></div><div class="fsz">Max 1 MB</div></div>
+                <div class="fg full"><label class="fl">Other Documents (PAN Card / GST Certificate / TRC / Company Incorporation Certificate)</label><div class="file-row"><div class="file-btn" onclick="pickFile('a-otherdoc','a-otherdoc-ok')">📎 Attach PDF</div><span class="file-ok" id="a-otherdoc-ok"></span></div><div class="fsz">Max 5 MB</div></div>
+              </div>
+            </div>
+            <!-- Items List -->
+            <div class="items-section">
+              <div class="form-section-hd" style="margin-bottom:6px"><span>📦</span>Items List</div>
+              <div class="items-hint">Press <kbd style="background:var(--surf3);border:1px solid var(--bdr2);padding:1px 5px;border-radius:3px;font-size:10px">Enter</kbd> in Item Name to add a new line within the cell. Press <kbd style="background:var(--surf3);border:1px solid var(--bdr2);padding:1px 5px;border-radius:3px;font-size:10px">Tab</kbd> to move to next field. Click <strong>+ Add row</strong> to add a new item row.</div>
+              <table class="items-tbl" id="tbl-a">
+                <thead><tr>
+                  <th style="width:34px">#</th>
+                  <th style="min-width:200px">Item Name<br><span style="font-weight:400;font-size:9px;opacity:.7">Enter for new line</span></th>
+                  <th style="min-width:110px">Part No.</th>
+                  <th style="min-width:110px">Serial No.</th>
+                  <th style="width:64px">QTY</th>
+                  <th>Remark</th>
+                  <th style="width:28px"></th>
+                </tr></thead>
+                <tbody id="tbody-a"></tbody>
+              </table>
+              <div class="add-row-link" onclick="addItemRow()">＋ Add row</div>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-gold" onclick="saveModA()" id="btn-save-a">💾 Save &amp; Sync to Drive</button>
+              <button class="btn btn-sheets" onclick="openSheet()">📊 View Google Sheet</button>
+              <button class="btn" onclick="clearFormA()">✕ Clear Form</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- SYNC LOG -->
+      <div id="view-synclog" class="view">
+        <div class="log-wrap">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+            <div><div style="font-family:var(--fds);font-size:22px;color:var(--tx)">Sync Log</div><div style="font-size:12px;color:var(--tx3);margin-top:2px">Google Drive sync events</div></div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-sm" onclick="loadSyncLog()">↻ Refresh</button>
+              <button class="btn btn-sheets btn-sm" onclick="openSheet()">📊 Open Sheet</button>
+            </div>
+          </div>
+          <div id="synclog-wrap"><div class="empty"><span class="empty-icon">📋</span><h3>No sync history yet</h3></div></div>
+        </div>
+      </div>
+
+      <!-- ACTION LOG -->
+      <div id="view-actionlog" class="view">
+        <div class="log-wrap">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+            <div><div style="font-family:var(--fds);font-size:22px;color:var(--tx)">Action Log</div><div style="font-size:12px;color:var(--tx3);margin-top:2px">All user actions — safety &amp; reliability audit trail</div></div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-sm" onclick="loadActionLog()">↻ Refresh</button>
+              <input type="text" id="al-search" placeholder="Filter by user / action…" style="height:30px;padding:0 9px;font-size:11px;border:1px solid var(--bdr2);border-radius:var(--r);background:var(--surf2);color:var(--tx);font-family:var(--fui);outline:none;width:180px" oninput="filterActionLog()">
+            </div>
+          </div>
+          <div id="actionlog-wrap"><div class="empty"><span class="empty-icon">📜</span><h3>No action log yet</h3><p>User actions will appear here</p></div></div>
+        </div>
+      </div>
+
+      <!-- USER MANAGEMENT -->
+      <div id="view-users" class="view">
+        <div class="users-wrap">
+          <div style="font-family:var(--fds);font-size:22px;color:var(--tx);margin-bottom:4px">User Management</div>
+          <div style="font-size:12px;color:var(--tx3);margin-bottom:18px">Control who can access the system and what they can do</div>
+
+          <!-- Role permissions reference -->
+          <div class="settings-card" style="margin-bottom:14px">
+            <h3>🛡 Role Permissions</h3>
+            <table class="perm-table">
+              <thead><tr><th>Feature</th><th>Admin</th><th>Manager</th><th>Staff</th><th>Viewer</th></tr></thead>
+              <tbody>
+                <tr><td>Dashboard</td><td class="perm-yes">✓</td><td class="perm-yes">✓</td><td class="perm-yes">✓</td><td class="perm-yes">✓</td></tr>
+                <tr><td>Inward Inquiry (save)</td><td class="perm-yes">✓</td><td class="perm-yes">✓</td><td class="perm-yes">✓</td><td class="perm-no">✗</td></tr>
+                <tr><td>Main Sheet</td><td class="perm-yes">✓</td><td class="perm-yes">✓</td><td class="perm-yes">✓</td><td class="perm-ro">Read only</td></tr>
+                <tr><td>Sync Log</td><td class="perm-yes">✓</td><td class="perm-yes">✓</td><td class="perm-no">✗</td><td class="perm-no">✗</td></tr>
+                <tr><td>Action Log</td><td class="perm-yes">✓</td><td class="perm-yes">✓</td><td class="perm-no">✗</td><td class="perm-no">✗</td></tr>
+                <tr><td>User Management</td><td class="perm-yes">✓</td><td class="perm-no">✗</td><td class="perm-no">✗</td><td class="perm-no">✗</td></tr>
+                <tr><td>Settings</td><td class="perm-yes">✓</td><td class="perm-no">✗</td><td class="perm-no">✗</td><td class="perm-no">✗</td></tr>
+                <tr><td>Delete Records</td><td class="perm-yes">✓</td><td class="perm-yes">✓</td><td class="perm-no">✗</td><td class="perm-no">✗</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Users table -->
+          <div class="users-card">
+            <div class="users-card-hd">
+              <span>Authorised Users</span>
+              <button class="btn btn-sm" onclick="loadUsers()">↻ Refresh</button>
+            </div>
+            <div id="users-table-wrap">
+              <div class="empty"><span class="empty-icon">👥</span><h3>No users loaded</h3><p>Click Refresh</p></div>
+            </div>
+            <!-- Add user form -->
+            <div class="add-user-form">
+              <div style="font-size:11px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:9px">Add / Update User</div>
+              <div class="add-user-grid">
+                <div class="auf"><label>Gmail Address</label><input type="email" id="nu-email" placeholder="user@gmail.com"></div>
+                <div class="auf"><label>Full Name</label><input type="text" id="nu-name" placeholder="Full name"></div>
+                <div class="auf"><label>Role</label>
+                  <select id="nu-role">
+                    <option value="Staff">Staff</option>
+                    <option value="Viewer">Viewer</option>
+                    <option value="Manager">Manager</option>
+                    <option value="Admin">Admin</option>
+                  </select>
+                </div>
+                <div class="auf"><label>Status</label>
+                  <select id="nu-status"><option value="Active">Active</option><option value="Inactive">Inactive</option></select>
+                </div>
+                <div class="auf"><label>&nbsp;</label><button class="btn btn-navy btn-sm" onclick="saveUser()">Add / Update</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div id="view-settings" class="view">
+        <div id="lock-screen">
+          <div class="lock-box">
+            <span class="lock-icon">🔐</span>
+            <h3>Settings Protected</h3>
+            <p>Enter your settings password to access configuration. This prevents accidental changes to your live connection.</p>
+            <input type="password" id="pwd-inp" placeholder="••••••••" onkeydown="if(event.key==='Enter')unlockSettings()">
+            <div class="lock-err" id="lock-err"></div>
+            <button class="btn btn-navy" style="width:100%;justify-content:center;margin-top:4px" onclick="unlockSettings()">🔓 Unlock Settings</button>
+            <div class="lock-hint">Default password: <strong>imse2024</strong><br>Change it after first login.</div>
+          </div>
+        </div>
+        <div class="settings-body">
+          <div class="settings-hd">
+            <div class="settings-hd-l"><h2>Settings</h2><p>System configuration — Admin only</p></div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="unlock-badge">🔓 Unlocked</div>
+              <button class="btn btn-sm btn-danger" onclick="lockSettings()">🔒 Lock</button>
+            </div>
+          </div>
+
+          <div class="sheets-jump">
+            <div class="sheets-jump-info">
+              <h4>📊 Google Sheet — Direct Access</h4>
+              <p>Jump to your live Google Sheet or Drive folder</p>
+              <span class="url-pill" id="url-preview">No Sheet ID configured yet</span>
+            </div>
+            <div class="jump-btns">
+              <button class="btn btn-sheets" onclick="openSheet()">Open Google Sheet ↗</button>
+              <button class="btn btn-sm" onclick="openFolder()">Open Drive Folder ↗</button>
+            </div>
+          </div>
+
+          <div class="settings-card">
+            <h3>🔌 Google Apps Script Connection</h3>
+            <div class="s-grid">
+              <div class="sf"><label>Apps Script Web App URL</label><input type="text" id="cfg-url" placeholder="https://script.google.com/macros/s/.../exec"><span class="hint">Deploy → Web App → Copy URL</span></div>
+              <div class="sf"><label>Your Name / User Tag</label><input type="text" id="cfg-user" placeholder="Staff Name"></div>
+            </div>
+            <div class="s-grid">
+              <div class="sf"><label>Google Sheet ID</label><input type="text" id="cfg-sheet" placeholder="Sheet ID from URL"><span class="hint">URL: /spreadsheets/d/<code>[ID]</code>/edit</span></div>
+              <div class="sf"><label>Google Drive Folder ID</label><input type="text" id="cfg-folder" placeholder="Folder ID from URL"><span class="hint">URL: /folders/<code>[ID]</code></span></div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:4px">
+              <button class="btn btn-gold" onclick="saveConfig()">💾 Save &amp; Initialize Sheets</button>
+              <button class="btn" onclick="testConn()">🔗 Test Connection</button>
+            </div>
+          </div>
+
+          <div class="settings-card">
+            <h3>🔑 Google Sign-In Client ID</h3>
+            <div class="s-grid" style="grid-template-columns:1fr">
+              <div class="sf">
+                <label>Google OAuth 2.0 Client ID</label>
+                <input type="text" id="cfg-clientid" placeholder="xxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.apps.googleusercontent.com">
+                <span class="hint">Create at: <a href="https://console.cloud.google.com/apis/credentials" target="_blank" style="color:var(--n500)">console.cloud.google.com/apis/credentials</a> → OAuth 2.0 Client IDs → Web application. Add this file's URL to Authorised JavaScript origins.</span>
+              </div>
+            </div>
+            <button class="btn btn-navy btn-sm" onclick="saveClientId()" style="margin-top:8px">Save Client ID &amp; Reload</button>
+          </div>
+
+          <div class="settings-card">
+            <h3>🔑 Change Settings Password</h3>
+            <div class="pwd-row">
+              <div class="sf"><label>Current Password</label><input type="password" id="pwd-cur" placeholder="Current" style="font-family:var(--fmono);letter-spacing:.1em"></div>
+              <div class="sf"><label>New Password</label><input type="password" id="pwd-new" placeholder="New (min 4)" style="font-family:var(--fmono);letter-spacing:.1em"></div>
+              <div class="sf"><label>Confirm New</label><input type="password" id="pwd-cfm" placeholder="Confirm" style="font-family:var(--fmono);letter-spacing:.1em"></div>
+              <div class="sf"><label>&nbsp;</label><button class="btn btn-teal" onclick="changePwd()">Update</button></div>
+            </div>
+            <div class="pwd-note">⚠ If locked out: browser DevTools → Application → Local Storage → delete <code style="background:var(--surf3);padding:1px 4px;border-radius:3px;font-family:var(--fmono);font-size:9px">sp_pwd</code> → refresh → password resets to <strong>imse2024</strong>.</div>
+          </div>
+
+          <div class="settings-card">
+            <h3>ℹ System Information</h3>
+            <div class="sysinfo-grid">
+              <div class="si-item"><div class="si-lbl">Version</div><div class="si-val">v4.0.0</div></div>
+              <div class="si-item"><div class="si-lbl">Active Module</div><div class="si-val" style="color:var(--n600)">Tab A (23 fields)</div></div>
+              <div class="si-item"><div class="si-lbl">Main Sheet Cols</div><div class="si-val">37</div></div>
+              <div class="si-item"><div class="si-lbl">Roles Available</div><div class="si-val">Admin · Manager · Staff · Viewer</div></div>
+              <div class="si-item"><div class="si-lbl">Config Saved</div><div class="si-val" id="si-saved">—</div></div>
+              <div class="si-item"><div class="si-lbl">Signed In As</div><div class="si-val" id="si-signedin">—</div></div>
+            </div>
+          </div>
+
+          <div class="settings-card danger-zone">
+            <h3>⚠ Danger Zone</h3>
+            <p style="font-size:12px;color:var(--tx3);margin-bottom:11px">These actions cannot be undone.</p>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-danger btn-sm" onclick="clearCfg()">🗑 Clear Local Config</button>
+              <button class="btn btn-danger btn-sm" onclick="resetPwd()">🔑 Reset Password to Default</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<div id="toast"></div>
+<input type="file" id="file-picker" accept=".pdf" style="display:none" onchange="fileChosen(this)">
+
+<script>
+// ════════════════════════════════════════════
+//  CONFIG & SESSION
+// ════════════════════════════════════════════
+var C={
+  url:      ls('sp_url')      ||'',
+  sheet:    ls('sp_sheet')    ||'',
+  folder:   ls('sp_folder')   ||'',
+  user:     ls('sp_user')     ||'Staff',
+  pwd:      ls('sp_pwd')      ||'imse2024',
+  clientId: ls('sp_clientid') ||''
+};
+
+// Session stored in sessionStorage (cleared on tab close)
+var SESSION = null;
+try{ SESSION=JSON.parse(sessionStorage.getItem('sp_session')||'null'); }catch(e){}
+
+var _msData=[],_msCols=[],_alData=[],_fTarget=null,_fLabel=null,_settingsUnlocked=false;
+var _itemRowCount=0;
+
+function ls(k){return localStorage.getItem(k)}
+function lss(k,v){localStorage.setItem(k,v)}
+function sId(id,v){var el=document.getElementById(id);if(el)el.textContent=v}
+
+var MAIN_COLS=[
+  "Vendor Code","Inquiry Received At & Date","Buyer Company Name & End User Name",
+  "Inquiry No. & Date & Inquiry Document","Drawing","Description & Maker",
+  "Vessel Name & IMO No.","Port of Delivery","Currency",
+  "Inquiry To Alfa Laval","Quotation Received Date & No. & AMT (From Alfa Laval)",
+  "Distributors Discount Include or Not","Net Weight",
+  "Quotation No. & Date & AMT (Send From IMSE BVBA To Party)",
+  "PO No. & Date & AMT (Received From Party)",
+  "PO No. & Date & AMT (Send To Alfa Laval)",
+  "OA No. & Deliver Date","Proforma Invoice",
+  "Commercial Invoice No. & Date (Received From Alfa Laval)",
+  "Sales Invoice No. & Date (Send From IMSE BVBA To Party)",
+  "Payment Status (Received From Party)","Payment Status (Send To Alfa Laval)",
+  "Buyer Invoicing Address","Buyer Contact Person Name, Destination, Mob No. & Mail Id",
+  "Alfa Laval Address & Contact Person Name",
+  "Completed Vendor Registration Form","PAN Card Copy","Cancelled Cheque",
+  "GST No. (Certificate Copy)","ISO Certificate","Anti-Corruption Policy",
+  "HSSEQ Policy","Tax Residency Certificate (TRC)","No PE Declaration",
+  "Bank Details on Letterhead","Electronic Form 10F","Remark"
+];
+
+var ROLE_PERMS={
+  Admin:  {dashboard:1,mainsheet:1,modA:1,synclog:1,actionlog:1,users:1,settings:1,save:1,del:1},
+  Manager:{dashboard:1,mainsheet:1,modA:1,synclog:1,actionlog:1,users:0,settings:0,save:1,del:1},
+  Staff:  {dashboard:1,mainsheet:1,modA:1,synclog:0,actionlog:0,users:0,settings:0,save:1,del:0},
+  Viewer: {dashboard:1,mainsheet:1,modA:0,synclog:0,actionlog:0,users:0,settings:0,save:0,del:0}
+};
+
+var WF=[
+  {id:'A',name:'Inward Inquiry',tab:'Tab A',dir:'From Party / Customer',live:true},
+  {id:'C',name:'Outward Inquiry',tab:'Tab C',dir:'To Alfa Laval',live:false},
+  {id:'D',name:'Inward Quotation',tab:'Tab D',dir:'From Alfa Laval',live:false},
+  {id:'E',name:'Outward Quotation',tab:'Tab E',dir:'To Customer',live:false},
+  {id:'F',name:'Inward PO',tab:'Tab F',dir:'From Customer',live:false},
+  {id:'G',name:'Outward PO',tab:'Tab G',dir:'To Alfa Laval',live:false},
+  {id:'H',name:'Order Confirmation',tab:'Tab H',dir:'From Supplier',live:false},
+  {id:'L',name:'Proforma Invoice',tab:'Tab L',dir:'To Customer',live:false},
+  {id:'Q',name:'Tax Invoice',tab:'Tab Q',dir:'To Customer',live:false},
+];
+
+// ════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════
+window.onload=function(){
+  // If existing valid session → go straight to app
+  if(SESSION && SESSION.email && SESSION.role){
+    enterApp(SESSION);
+  } else {
+    showLogin();
+  }
+};
+
+function showLogin(){
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('app').classList.remove('visible');
+  initGoogleSignIn();
+}
+
+function initGoogleSignIn(){
+  if(!C.clientId){
+    document.getElementById('google-signin-btn').style.display='none';
+    document.getElementById('login-no-gsi').style.display='block';
+    return;
+  }
+  if(typeof google==='undefined'){
+    setTimeout(initGoogleSignIn,500);return;
+  }
+  google.accounts.id.initialize({
+    client_id: C.clientId,
+    callback: handleCredentialResponse,
+    auto_select: false,
+    cancel_on_tap_outside: true
+  });
+  google.accounts.id.renderButton(
+    document.getElementById('google-signin-btn'),
+    {theme:'outline',size:'large',text:'signin_with',shape:'rectangular',width:280}
+  );
+}
+
+function handleCredentialResponse(response){
+  sId('login-err','');
+  document.getElementById('login-spinner').style.display='block';
+
+  // Decode JWT payload to get email
+  try{
+    var payload = JSON.parse(atob(response.credential.split('.')[1]));
+    var email = payload.email;
+    if(!email){sId('login-err','Could not read email from token');document.getElementById('login-spinner').style.display='none';return;}
+
+    if(!C.url){
+      // No backend configured — allow admin bypass for setup
+      sId('login-err','Apps Script URL not configured. Go to Settings first.');
+      document.getElementById('login-spinner').style.display='none';
+      return;
+    }
+
+    // Verify with backend
+    apiAuth('GET','verifySession&email='+encodeURIComponent(email),response.credential,null,function(res){
+      document.getElementById('login-spinner').style.display='none';
+      if(res.status==='ok' && res.user){
+        var sess={
+          email:res.user.email,
+          name:res.user.name,
+          picture:res.user.picture||'',
+          role:res.user.role,
+          token:response.credential,
+          exp:Date.now()+3600000 // 1 hour
+        };
+        sessionStorage.setItem('sp_session',JSON.stringify(sess));
+        SESSION=sess;
+        // Update last login
+        apiPost('updateLastLogin',{},function(){});
+        enterApp(sess);
+      } else {
+        sId('login-err',res.message||'Access denied. Contact your Admin.');
+      }
+    });
+  }catch(e){
+    document.getElementById('login-spinner').style.display='none';
+    sId('login-err','Sign-in error: '+e.message);
+  }
+}
+
+function enterApp(sess){
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('app').classList.add('visible');
+
+  // Populate user info in sidebar
+  var av=document.getElementById('sb-avatar');
+  if(sess.picture){
+    av.innerHTML='<img src="'+sess.picture+'" style="width:32px;height:32px;border-radius:50%;object-fit:cover" onerror="this.parentElement.textContent=\''+initials(sess.name)+'\'">';
+  } else {
+    av.textContent=initials(sess.name);
+  }
+  sId('sb-uname',sess.name||sess.email);
+  sId('sb-urole',sess.role+' Account');
+
+  // Role badge in topbar
+  var rb=document.getElementById('role-badge-top');
+  rb.textContent=sess.role;
+  rb.className='role-badge role-'+sess.role.toLowerCase();
+
+  applyRoleUI(sess.role);
+  buildWF();
+  loadStats();
+
+  // Log login action
+  apiPost('logAction',{action:'LOGIN',module:'System',details:'Signed in',recordId:''},function(){});
+  if(C.url){sDot('warn');sId('sb-status',sess.name+' · Connected')}
+
+  document.getElementById('si-signedin').textContent=sess.email+' ('+sess.role+')';
+}
+
+function signOut(){
+  apiPost('logAction',{action:'LOGOUT',module:'System',details:'Signed out',recordId:''},function(){});
+  sessionStorage.removeItem('sp_session');
+  SESSION=null;
+  if(typeof google!=='undefined'){try{google.accounts.id.disableAutoSelect();}catch(e){}}
+  showLogin();
+  toast('Signed out successfully','info');
+}
+
+function initials(name){
+  if(!name)return'?';
+  var parts=name.trim().split(' ');
+  return parts.length>=2?(parts[0][0]+parts[parts.length-1][0]).toUpperCase():name[0].toUpperCase();
+}
+
+// ════════════════════════════════════════════
+//  ROLE-BASED UI
+// ════════════════════════════════════════════
+function applyRoleUI(role){
+  var p=ROLE_PERMS[role]||ROLE_PERMS.Viewer;
+
+  // Nav visibility
+  var navMap={
+    'nav-modA':'modA','nav-synclog':'synclog',
+    'nav-actionlog':'actionlog','nav-users':'users','nav-settings':'settings'
+  };
+  Object.keys(navMap).forEach(function(navId){
+    var key=navMap[navId];
+    var perm=p[key]!==undefined?p[key]:1;
+    var el=document.getElementById(navId);
+    if(el){
+      if(!perm){el.classList.add('hidden-nav');el.style.display='none';}
+      else{el.classList.remove('hidden-nav');el.style.display='';}
+    }
+  });
+
+  // Disable save button for viewer
+  var btnSave=document.getElementById('btn-save-a');
+  if(btnSave) btnSave.style.display=p.save?'':'none';
+
+  // Viewer: export CSV always shown, but label changes
+  var btnCsv=document.getElementById('btn-export-csv');
+  if(btnCsv) btnCsv.style.display='';
+}
+
+function canDo(perm){
+  var role=(SESSION&&SESSION.role)||'Viewer';
+  var p=ROLE_PERMS[role]||ROLE_PERMS.Viewer;
+  return !!p[perm];
+}
+
+// ════════════════════════════════════════════
+//  API
+// ════════════════════════════════════════════
+function apiAuth(method,action,token,body,cb){
+  if(!C.url){toast('Configure Apps Script URL in Settings','warn');return}
+  var email=(SESSION&&SESSION.email)||'';
+  var url=C.url+(method==='GET'?'?action='+action+'&email='+encodeURIComponent(email)+'&token='+encodeURIComponent(token):'');
+  var opts={method:method};
+  if(method==='POST'){
+    body=body||{};body.action=action;body.email=email;body.token=token;
+    opts.body=JSON.stringify(body);opts.headers={'Content-Type':'text/plain'};
+  }
+  fetch(url,opts).then(function(r){return r.json()}).then(function(d){cb(d)}).catch(function(e){cb({status:'error',message:e.toString()})});
+}
+
+function api(action,params,cb){
+  if(!SESSION){toast('Not signed in','err');return}
+  var t=SESSION.token||'';
+  var full=action+(params?'&'+params:'');
+  apiAuth('GET',full,t,null,cb);
+}
+
+function apiPost(action,body,cb){
+  if(!SESSION&&action!=='verifySession'){toast('Not signed in','err');return}
+  var t=(SESSION&&SESSION.token)||'';
+  apiAuth('POST',action,t,body,cb);
+}
+
+// ════════════════════════════════════════════
+//  NAVIGATION
+// ════════════════════════════════════════════
+function go(el,view){
+  if(!canDo(view)&&view!=='dashboard'&&view!=='mainsheet'){toast('Access denied for your role','err');return}
+  document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});
+  el.classList.add('active');
+  document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active')});
+  document.getElementById('view-'+view).classList.add('active');
+  var m={
+    dashboard:['Dashboard','Overview'],
+    mainsheet:['Main Sheet','37 Columns'],
+    modA:['Inward Inquiry','Tab A — 23 Fields'],
+    synclog:['Sync Log','Drive History'],
+    actionlog:['Action Log','User Activity Audit'],
+    users:['User Management','Role-Based Access'],
+    settings:['Settings','Protected Configuration'],
+  };
+  var t=m[view]||[view,''];
+  sId('ptitle',t[0]);sId('pbadge',t[1]);
+
+  // Log navigation
+  apiPost('logAction',{action:'VIEW_'+view.toUpperCase(),module:t[0],details:'Navigated to '+t[0],recordId:''},function(){});
+
+  if(view==='mainsheet')loadMainSheet();
+  if(view==='synclog')loadSyncLog();
+  if(view==='actionlog')loadActionLog();
+  if(view==='users')loadUsers();
+  if(view==='settings')openSettings();
+}
+
+function openSheet(){
+  if(!C.sheet){toast('No Sheet ID — configure in Settings','warn');return}
+  window.open('https://docs.google.com/spreadsheets/d/'+C.sheet+'/edit','_blank');
+}
+function openFolder(){
+  if(!C.folder){toast('No Folder ID — configure in Settings','warn');return}
+  window.open('https://drive.google.com/drive/folders/'+C.folder,'_blank');
+}
+function updateUrlPreview(){
+  var el=document.getElementById('url-preview');
+  if(!el)return;
+  el.textContent=C.sheet?'https://docs.google.com/spreadsheets/d/'+C.sheet+'/edit':'No Sheet ID configured yet';
+}
+
+// ════════════════════════════════════════════
+//  SETTINGS LOCK
+// ════════════════════════════════════════════
+function openSettings(){
+  if(!_settingsUnlocked){
+    document.getElementById('lock-screen').classList.remove('hidden');
+    sId('lock-err','');document.getElementById('pwd-inp').value='';
+    setTimeout(function(){document.getElementById('pwd-inp').focus()},100);
+  } else {
+    populateCfg();updateUrlPreview();updateSysInfo();
+  }
+}
+function unlockSettings(){
+  var v=document.getElementById('pwd-inp').value;
+  if(v===C.pwd){
+    _settingsUnlocked=true;
+    document.getElementById('lock-screen').classList.add('hidden');
+    sId('lock-nav','🔓');
+    populateCfg();updateUrlPreview();updateSysInfo();
+    apiPost('logAction',{action:'UNLOCK_SETTINGS',module:'Settings',details:'Settings unlocked',recordId:''},function(){});
+    toast('Settings unlocked','ok');
+  } else {
+    sId('lock-err','Incorrect password');
+    var inp=document.getElementById('pwd-inp');
+    inp.classList.add('shake');
+    setTimeout(function(){inp.classList.remove('shake');inp.value='';inp.focus()},380);
+  }
+}
+function lockSettings(){
+  _settingsUnlocked=false;
+  document.getElementById('lock-screen').classList.remove('hidden');
+  sId('lock-nav','🔒');
+  toast('Settings locked','info');
+}
+function changePwd(){
+  var cur=document.getElementById('pwd-cur').value;
+  var nw=document.getElementById('pwd-new').value;
+  var cfm=document.getElementById('pwd-cfm').value;
+  if(cur!==C.pwd){toast('Current password incorrect','err');return}
+  if(nw.length<4){toast('Min 4 characters','warn');return}
+  if(nw!==cfm){toast('Passwords do not match','err');return}
+  C.pwd=nw;lss('sp_pwd',nw);
+  ['pwd-cur','pwd-new','pwd-cfm'].forEach(function(id){document.getElementById(id).value=''});
+  apiPost('logAction',{action:'CHANGE_PASSWORD',module:'Settings',details:'Settings password changed',recordId:''},function(){});
+  toast('Password updated','ok');
+}
+function resetPwd(){
+  if(!confirm('Reset password to "imse2024"?'))return;
+  C.pwd='imse2024';lss('sp_pwd','imse2024');toast('Password reset to: imse2024','warn');
+}
+function saveClientId(){
+  var cid=document.getElementById('cfg-clientid').value.trim();
+  C.clientId=cid;lss('sp_clientid',cid);
+  toast('Client ID saved — reloading…','ok');
+  setTimeout(function(){location.reload()},1200);
+}
+
+// ════════════════════════════════════════════
+//  CONFIG
+// ════════════════════════════════════════════
+function saveConfig(){
+  C.url=document.getElementById('cfg-url').value.trim();
+  C.sheet=document.getElementById('cfg-sheet').value.trim();
+  C.folder=document.getElementById('cfg-folder').value.trim();
+  C.user=document.getElementById('cfg-user').value.trim()||'Staff';
+  lss('sp_url',C.url);lss('sp_sheet',C.sheet);lss('sp_folder',C.folder);lss('sp_user',C.user);
+  lss('sp_saved',new Date().toLocaleString());
+  updateUrlPreview();updateSysInfo();
+  if(!C.url){toast('Enter the Apps Script URL','err');return}
+  syncState('busy');
+  // For init, use a direct call without auth requirement
+  fetch(C.url+'?action=init').then(function(r){return r.json()}).then(function(res){
+    if(res.status==='success'){
+      toast('✓ Sheets initialized! Created: '+(res.created||[]).join(', '),'ok');
+      syncState('on');sDot('on');
+      document.getElementById('live-dot').style.display='';
+      loadStats();
+    } else {toast('Init failed: '+res.message,'err');syncState('err');sDot('err')}
+  }).catch(function(e){toast('Init error: '+e,'err');syncState('err')});
+}
+function testConn(){
+  syncState('busy');
+  api('getStats',null,function(res){
+    if(res.status==='success'){toast('✓ Connection OK — '+res.mainSheetRecords+' main records','ok');syncState('on')}
+    else{toast('Connection failed: '+res.message,'err');syncState('err')}
+  });
+}
+function populateCfg(){
+  var f=function(id,v){var el=document.getElementById(id);if(el)el.value=v||''};
+  f('cfg-url',C.url);f('cfg-sheet',C.sheet);f('cfg-folder',C.folder);f('cfg-user',C.user);
+  f('cfg-clientid',C.clientId);
+}
+function updateSysInfo(){
+  sId('si-saved',ls('sp_saved')||'—');
+  document.getElementById('si-conn').innerHTML=C.url?'<span style="color:var(--gr500)">Yes</span>':'<span style="color:var(--r500)">No</span>';
+  if(SESSION)sId('si-signedin',SESSION.email+' ('+SESSION.role+')');
+}
+function clearCfg(){
+  if(!confirm('Clear all local config?'))return;
+  ['sp_url','sp_sheet','sp_folder','sp_user','sp_saved'].forEach(function(k){localStorage.removeItem(k)});
+  C.url=C.sheet=C.folder='';C.user='Staff';
+  populateCfg();updateUrlPreview();updateSysInfo();toast('Config cleared','warn');
+}
+
+// ════════════════════════════════════════════
+//  STATS
+// ════════════════════════════════════════════
+function loadStats(){
+  if(!C.url||!SESSION)return;
+  api('getStats',null,function(res){
+    if(res.status==='success'){
+      sId('stat-inq',res.inwardInquiries||0);
+      sId('stat-main',res.mainSheetRecords||0);
+      sId('stat-users',res.totalUsers||0);
+      document.getElementById('stat-conn').textContent='Connected';
+      document.getElementById('stat-conn').style.color='var(--gr500)';
+      sId('stat-sub','Last: '+new Date().toLocaleTimeString());
+      sDot('on');sId('sb-status',(SESSION.name||SESSION.email)+' · Connected');
+    }
+  });
+}
+
+// ════════════════════════════════════════════
+//  MAIN SHEET
+// ════════════════════════════════════════════
+function loadMainSheet(){
+  syncState('busy');
+  api('getRecords','sheet=Main Sheet',function(res){
+    if(res.status!=='success'){toast('Load failed: '+res.message,'err');syncState('err');return}
+    _msData=res.records||[];_msCols=res.headers||MAIN_COLS;
+    renderMS(_msData);syncState('on');
+    toast('Loaded '+_msData.length+' records','ok');
+  });
+}
+function colClass(i){return i===0?'ca':i<2?'cb':i<9?'cc-col':'cd'}
+function renderMS(rows){
+  document.getElementById('ms-head').innerHTML='<tr><th class="sticky-col">#</th>'+
+    _msCols.map(function(c,i){return '<th class="'+colClass(i)+'">'+c+'</th>'}).join('')+'</tr>';
+  if(!rows.length){
+    document.getElementById('ms-body').innerHTML='<tr><td colspan="38"><div class="empty"><span class="empty-icon">📊</span><h3>No records yet</h3><p>Save from Inward Inquiry to see data here</p></div></td></tr>';
+    sId('ms-count','0 records');return;
+  }
+  document.getElementById('ms-body').innerHTML=rows.map(function(r,i){
+    return '<tr onclick="this.classList.toggle(\'sel\')">'+'<td class="sticky-col">'+(i+1)+'</td>'+
+      _msCols.map(function(c,ci){var v=String(r[c]||'');return '<td class="'+colClass(ci)+'" title="'+v+'">'+(v.length>26?v.slice(0,25)+'…':v)+'</td>'}).join('')+'</tr>';
+  }).join('');
+  sId('ms-count',rows.length+' records');
+}
+function filterMS(){
+  var q=document.getElementById('ms-search').value.toLowerCase();
+  renderMS(q?_msData.filter(function(r){return _msCols.some(function(c){return String(r[c]||'').toLowerCase().includes(q)})}):_msData);
+}
+function exportCSV(){
+  if(!_msData.length){toast('Refresh first','warn');return}
+  var csv=[_msCols.join(',')].concat(_msData.map(function(r){
+    return _msCols.map(function(c){return '"'+String(r[c]||'').replace(/"/g,'""')+'"'}).join(',');
+  })).join('\n');
+  var a=document.createElement('a');
+  a.href='data:text/csv,'+encodeURIComponent(csv);
+  a.download='MainSheet_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+  toast('CSV exported','ok');
+}
+
+// ════════════════════════════════════════════
+//  SAVE MODULE A
+// ════════════════════════════════════════════
+function saveModA(){
+  if(!canDo('save')){toast('Your role cannot save records','err');return}
+  var co=document.getElementById('a-company').value.trim();
+  var iq=document.getElementById('a-inqno').value.trim();
+  if(!co||!iq){toast('Buyer Company Name and Inquiry No. are required','warn');return}
+
+  var items=[];
+  document.querySelectorAll('#tbody-a tr').forEach(function(tr,i){
+    var ta=tr.querySelector('.item-name-ta');
+    var ins=tr.querySelectorAll('.item-inp');
+    var itemName=ta?ta.value.trim():'';
+    if(itemName||( ins[0]&&ins[0].value)){
+      items.push({
+        srNo:i+1,
+        itemName:itemName,
+        partNo:ins[0]&&ins[0].value||'',
+        serialNo:ins[1]&&ins[1].value||'',
+        qty:ins[2]&&ins[2].value||'',
+        remark:ins[3]&&ins[3].value||''
+      });
+    }
+  });
+
+  syncState('busy');
+  apiPost('saveInwardInquiry',{
+    inquiryReceivedAt:     document.getElementById('a-rcvdat').value,
+    inquiryReceivedDate:   document.getElementById('a-rcvddate').value,
+    buyerCompanyName:      co,
+    inquiryNo:             iq,
+    inquiryDate:           document.getElementById('a-inqdate').value,
+    currency:              document.getElementById('a-currency').value,
+    buyerAssignedCode:     document.getElementById('a-code').value,
+    gstNo:                 document.getElementById('a-gstno').value,
+    buyerInvoicingAddress: document.getElementById('a-address').value,
+    buyerContactPerson:    document.getElementById('a-contact').value,
+    buyerPhoneNo:          document.getElementById('a-phone').value,
+    buyerWhatsappNo:       document.getElementById('a-whatsapp').value,
+    buyerEmailIds:         document.getElementById('a-emails').value,
+    maker:                 document.getElementById('a-maker').value,
+    equipmentSerialNo:     document.getElementById('a-eqserial').value,
+    equipmentMfgDate:      document.getElementById('a-eqmfg').value,
+    description:           document.getElementById('a-desc').value,
+    vesselName:            document.getElementById('a-vessel').value,
+    vesselImoNo:           document.getElementById('a-imo').value,
+    portOfDelivery:        document.getElementById('a-port').value,
+    inquiryDocumentLink:   document.getElementById('a-inqdoc-ok').textContent||'',
+    drawingLink:           document.getElementById('a-drw-ok').textContent||'',
+    otherDocumentsLink:    document.getElementById('a-otherdoc-ok').textContent||'',
+    items:                 items
+  },function(res){
+    if(res.status==='success'){
+      toast('✓ Saved! Record ID: '+res.recordId,'ok');
+      syncState('on');loadStats();
+    } else {toast('Save failed: '+res.message,'err');syncState('err')}
+  });
+}
+
+function syncAll(){
+  if(!canDo('save')){toast('Your role cannot sync','err');return}
+  syncState('busy');
+  apiPost('syncToMainSheet',{},function(res){
+    if(res.status==='success'){toast('✓ Sync complete — '+res.synced+' records','ok');syncState('on');loadStats()}
+    else{toast('Sync failed: '+res.message,'err');syncState('err')}
+  });
+}
+
+// ════════════════════════════════════════════
+//  SYNC LOG
+// ════════════════════════════════════════════
+function loadSyncLog(){
+  api('getRecords','sheet=Sync History',function(res){
+    var w=document.getElementById('synclog-wrap');
+    if(res.status!=='success'||!res.records||!res.records.length){
+      w.innerHTML='<div class="empty"><span class="empty-icon">📋</span><h3>No sync history yet</h3></div>';return;
+    }
+    var rows=res.records.slice().reverse();
+    w.innerHTML='<table class="log-tbl"><thead><tr><th>Timestamp</th><th>Action</th><th>Records</th><th>Status</th><th>Notes</th></tr></thead><tbody>'+
+      rows.map(function(r){
+        var ok=String(r['Status']||'').toLowerCase()==='success';
+        return '<tr><td style="font-family:var(--fmono);font-size:10px">'+String(r['Timestamp']||'').slice(0,19).replace('T',' ')+'</td>'+
+          '<td>'+(r['Action']||'')+'</td>'+
+          '<td style="text-align:center;font-family:var(--fmono)">'+(r['Records']||r['Records Synced']||0)+'</td>'+
+          '<td><span class="'+(ok?'badge-ok':'badge-err')+'">'+(r['Status']||'')+'</span></td>'+
+          '<td style="color:var(--tx4);font-size:11px">'+(r['Notes']||'')+'</td></tr>';
+      }).join('')+'</tbody></table>';
+  });
+}
+
+// ════════════════════════════════════════════
+//  ACTION LOG
+// ════════════════════════════════════════════
+function loadActionLog(){
+  api('getActionLog',null,function(res){
+    _alData=res.records||[];
+    renderActionLog(_alData);
+  });
+}
+function renderActionLog(rows){
+  var w=document.getElementById('actionlog-wrap');
+  if(!rows||!rows.length){
+    w.innerHTML='<div class="empty"><span class="empty-icon">📜</span><h3>No actions logged yet</h3></div>';return;
+  }
+  w.innerHTML='<table class="log-tbl"><thead><tr><th>Timestamp</th><th>User</th><th>Role</th><th>Action</th><th>Module</th><th>Details</th><th>Record ID</th></tr></thead><tbody>'+
+    rows.map(function(r){
+      var role=r['Role']||'';
+      var roleCls='role-badge role-'+(role.toLowerCase());
+      return '<tr>'+
+        '<td style="font-family:var(--fmono);font-size:10px">'+String(r['Timestamp']||'').slice(0,19).replace('T',' ')+'</td>'+
+        '<td style="font-size:11px"><div>'+( r['User Name']||'')+'</div><div style="font-size:10px;color:var(--tx4)">'+( r['Email']||'')+'</div></td>'+
+        '<td><span class="'+roleCls+'" style="padding:2px 6px;border-radius:4px;font-size:9px;font-weight:600">'+role+'</span></td>'+
+        '<td style="font-family:var(--fmono);font-size:10px">'+( r['Action']||'')+'</td>'+
+        '<td style="font-size:11px">'+( r['Module']||'')+'</td>'+
+        '<td style="font-size:11px;color:var(--tx3)">'+( r['Details']||'')+'</td>'+
+        '<td style="font-family:var(--fmono);font-size:10px;color:var(--tx4)">'+( r['Record ID']||'')+'</td>'+
+        '</tr>';
+    }).join('')+'</tbody></table>';
+}
+function filterActionLog(){
+  var q=document.getElementById('al-search').value.toLowerCase();
+  if(!q){renderActionLog(_alData);return}
+  var cols=['Email','User Name','Role','Action','Module','Details'];
+  renderActionLog(_alData.filter(function(r){return cols.some(function(c){return String(r[c]||'').toLowerCase().includes(q)})}));
+}
+
+// ════════════════════════════════════════════
+//  USER MANAGEMENT
+// ════════════════════════════════════════════
+function loadUsers(){
+  api('getUsers',null,function(res){
+    var w=document.getElementById('users-table-wrap');
+    if(res.status!=='success'||!res.users||!res.users.length){
+      w.innerHTML='<div class="empty"><span class="empty-icon">👥</span><h3>No users yet</h3><p>Add the first user below</p></div>';return;
+    }
+    w.innerHTML='<table class="users-tbl"><thead><tr><th>Email</th><th>Name</th><th>Role</th><th>Status</th><th>Added By</th><th>Last Login</th><th>Actions</th></tr></thead><tbody>'+
+      res.users.map(function(u){
+        var role=u['Role']||'';
+        var roleCls='role-badge role-'+(role.toLowerCase());
+        var status=u['Status']||'Active';
+        return '<tr>'+
+          '<td>'+u['Email']+'</td>'+
+          '<td>'+( u['Name']||'—')+'</td>'+
+          '<td><span class="'+roleCls+'" style="padding:2px 7px;border-radius:4px;font-size:9px;font-weight:600">'+role+'</span></td>'+
+          '<td><span class="status-'+(status.toLowerCase()===''?'active':status.toLowerCase())+'">'+status+'</span></td>'+
+          '<td style="font-size:11px;color:var(--tx4)">'+( u['Added By']||'—')+'</td>'+
+          '<td style="font-size:11px;font-family:var(--fmono);color:var(--tx4)">'+( String(u['Last Login']||'').slice(0,10)||'Never')+'</td>'+
+          '<td><button class="btn btn-xs btn-danger" onclick="deleteUser(\''+u['Email']+'\')">Remove</button></td>'+
+          '</tr>';
+      }).join('')+'</tbody></table>';
+  });
+}
+function saveUser(){
+  var email=document.getElementById('nu-email').value.trim();
+  var name=document.getElementById('nu-name').value.trim();
+  var role=document.getElementById('nu-role').value;
+  var status=document.getElementById('nu-status').value;
+  if(!email){toast('Email is required','warn');return}
+  apiPost('saveUser',{userEmail:email,userName:name,userRole:role,userStatus:status},function(res){
+    if(res.status==='success'){
+      toast('✓ User '+(res.action==='added'?'added':'updated')+': '+email,'ok');
+      ['nu-email','nu-name'].forEach(function(id){document.getElementById(id).value=''});
+      loadUsers();loadStats();
+    } else {toast('Error: '+res.message,'err')}
+  });
+}
+function deleteUser(email){
+  if(!confirm('Remove user: '+email+'?'))return;
+  apiPost('deleteUser',{userEmail:email},function(res){
+    if(res.status==='success'){toast('User removed: '+email,'ok');loadUsers();loadStats()}
+    else{toast('Error: '+res.message,'err')}
+  });
+}
+
+// ════════════════════════════════════════════
+//  ITEMS TABLE — multi-line textarea + Enter
+// ════════════════════════════════════════════
+window.onload=(function(originalOnload){
+  return function(){
+    if(originalOnload)originalOnload.call(this);
+    addItemRow(); // Add first row on load
+  };
+})(window.onload);
+
+function addItemRow(){
+  _itemRowCount++;
+  var n=_itemRowCount;
+  var tbody=document.getElementById('tbody-a');
+  var tr=document.createElement('tr');
+  tr.setAttribute('data-row',n);
+  tr.innerHTML=
+    '<td class="sr-cell">'+n+'</td>'+
+    '<td style="padding:0;min-width:200px">'+
+      '<textarea class="item-name-ta" placeholder="Item / part name (Enter for new line)" rows="1" '+
+        'oninput="autoResizeTa(this)" '+
+        'onkeydown="itemTaKeydown(event,this)"></textarea>'+
+    '</td>'+
+    '<td><input class="item-inp" placeholder="Part No."></td>'+
+    '<td><input class="item-inp" placeholder="Serial No."></td>'+
+    '<td><input class="item-inp" type="number" min="1" style="width:58px"></td>'+
+    '<td><input class="item-inp" placeholder="Remark" onkeydown="lastFieldKeydown(event,this)"></td>'+
+    '<td class="del-cell"><button onclick="delItemRow(this)" title="Remove row">✕</button></td>';
+  tbody.appendChild(tr);
+
+  // Renumber all rows
+  renumberRows();
+
+  // Focus the new textarea
+  var ta=tr.querySelector('.item-name-ta');
+  if(ta)ta.focus();
+}
+
+function itemTaKeydown(e,ta){
+  // Tab key → move to Part No. field
+  if(e.key==='Tab'&&!e.shiftKey){
+    e.preventDefault();
+    var partNoInput=ta.closest('tr').querySelector('.item-inp');
+    if(partNoInput)partNoInput.focus();
+  }
+  // Enter key → just let it add a new line (default textarea behavior)
+  // Ctrl+Enter or Shift+Enter → add a new row
+  if(e.key==='Enter'&&(e.ctrlKey||e.shiftKey)){
+    e.preventDefault();
+    addItemRow();
+  }
+  autoResizeTa(ta);
+}
+
+function lastFieldKeydown(e,input){
+  // Tab from last field → add new row and focus its Item Name
+  if(e.key==='Tab'&&!e.shiftKey){
+    e.preventDefault();
+    addItemRow();
+  }
+}
+
+function autoResizeTa(ta){
+  ta.style.height='auto';
+  ta.style.height=Math.max(36,ta.scrollHeight)+'px';
+}
+
+function delItemRow(btn){
+  var tr=btn.closest('tr');
+  if(document.getElementById('tbody-a').children.length<=1){
+    toast('At least one item row is required','warn');return;
+  }
+  tr.remove();
+  renumberRows();
+}
+
+function renumberRows(){
+  var rows=document.querySelectorAll('#tbody-a tr');
+  rows.forEach(function(tr,i){
+    var srCell=tr.querySelector('.sr-cell');
+    if(srCell)srCell.textContent=i+1;
+  });
+}
+
+function clearFormA(){
+  var f=document.getElementById('form-a');
+  if(f)f.querySelectorAll('input,select,textarea:not(.item-name-ta)').forEach(function(el){el.value='';el.style.borderColor=''});
+  document.querySelectorAll('.file-ok').forEach(function(el){el.textContent=''});
+  document.querySelectorAll('[id^="a-cc"]').forEach(function(el){var m=el.textContent.split('/')[1];if(m)el.textContent='0 /'+m;el.className='cc'});
+  // Reset items table
+  _itemRowCount=0;
+  document.getElementById('tbody-a').innerHTML='';
+  addItemRow();
+}
+
+// ════════════════════════════════════════════
+//  DASHBOARD WORKFLOW
+// ════════════════════════════════════════════
+function buildWF(){
+  var role=(SESSION&&SESSION.role)||'Viewer';
+  var p=ROLE_PERMS[role]||ROLE_PERMS.Viewer;
+  document.getElementById('wf-grid').innerHTML=WF.map(function(w){
+    var canAccess=w.live&&p.modA;
+    return '<div class="wf-card'+(canAccess?'':' locked')+'"'+(canAccess?' onclick="navToMod(\''+w.id+'\')"':'')+'>'+
+      '<div class="wf-top"><h4>'+w.name+'</h4><span class="wf-tag '+(canAccess?'live':'soon')+'">'+(w.tab||'—')+'</span></div>'+
+      '<p>'+w.dir+'</p>'+
+      (canAccess?'<span class="wf-arr">→</span>':'<span style="font-size:10px;color:var(--tx4);display:block;margin-top:5px">'+(!w.live?'Coming soon':'No access')+'</span>')+
+      '</div>';
+  }).join('');
+}
+function navToMod(id){var it=document.querySelector('.nav-item[onclick*="mod'+id+'"]');if(it)go(it,'mod'+id)}
+
+function refreshCurrent(){
+  var a=document.querySelector('.view.active');if(!a)return;
+  if(a.id==='view-mainsheet')loadMainSheet();
+  else if(a.id==='view-synclog')loadSyncLog();
+  else if(a.id==='view-actionlog')loadActionLog();
+  else if(a.id==='view-users')loadUsers();
+  else loadStats();
+}
+
+// ════════════════════════════════════════════
+//  FORM HELPERS
+// ════════════════════════════════════════════
+function cc(el,outId,max){
+  var n=el.value.length;
+  var o=document.getElementById(outId);
+  o.textContent=n+' / '+max;
+  o.className='cc'+(n>=max?' warn':'');
+  el.style.borderColor=n>=max?'var(--g400)':'';
+}
+function pickFile(fid,lid){_fTarget=fid;_fLabel=lid;document.getElementById('file-picker').value='';document.getElementById('file-picker').click()}
+function fileChosen(input){
+  var f=input.files[0];if(!f)return;
+  var maxSize=_fLabel&&_fLabel.indexOf('otherdoc')>=0?5242880:1048576;
+  if(f.size>maxSize){toast('File too large — max '+(maxSize===5242880?'5':'1')+' MB','err');return}
+  var el=document.getElementById(_fLabel);if(el)el.textContent='✓ '+f.name;
+  toast('Attached: '+f.name,'info');
+}
+
+// ════════════════════════════════════════════
+//  UI STATE
+// ════════════════════════════════════════════
+function syncState(s){
+  var d=document.getElementById('sp-dot'),t=document.getElementById('sp-txt');
+  d.className='sp-dot';
+  if(s==='on'){d.classList.add('on');t.textContent='Synced '+new Date().toLocaleTimeString()}
+  if(s==='busy'){d.classList.add('busy');t.textContent='Syncing…'}
+  if(s==='err'){d.classList.add('err');t.textContent='Sync error'}
+}
+function sDot(s){var d=document.getElementById('sb-fdot');d.className='sb-fdot';if(s==='on')d.classList.add('on');if(s==='warn')d.classList.add('warn');if(s==='err')d.classList.add('err')}
+function toast(msg,type){
+  var el=document.getElementById('toast');
+  var ic={ok:'✓',err:'✗',warn:'⚠',info:'ℹ'};
+  el.innerHTML='<span>'+(ic[type]||'ℹ')+'</span><span>'+msg+'</span>';
+  el.className='show '+(type||'info');
+  clearTimeout(el._t);el._t=setTimeout(function(){el.classList.remove('show')},3800);
+}
+</script>
+</body>
+</html>
