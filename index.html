@@ -508,20 +508,31 @@ table.log-tbl tr:hover td{background:var(--n50)}
             <div class="mod-badge"><div class="dot"></div>FORMAT NO. 1</div>
           </div>
           <div class="map-bar">
-            <div class="map-bar-ttl">Main Sheet Column Mapping (37 Columns)</div>
+            <div class="map-bar-ttl">Main Sheet Column Mapping (A → AL)</div>
             <div class="chips">
               <div class="chip">Vendor Code <em>Col A</em></div>
               <div class="chip">Inquiry Received At+Date <em>Col B</em></div>
-              <div class="chip">Buyer Co.+End User <em>Col C</em></div>
-              <div class="chip">Inquiry No.+Date+Doc <em>Col D</em></div>
-              <div class="chip">Drawing <em>Col E</em></div>
-              <div class="chip">Desc+Maker+Serial+Mfg <em>Col F</em></div>
-              <div class="chip">Vessel+IMO <em>Col G</em></div>
-              <div class="chip">Port <em>Col H</em></div>
-              <div class="chip">Currency <em>Col I</em></div>
-              <div class="chip">Address <em>Col W</em></div>
-              <div class="chip">Contact+Phone+WA+Emails <em>Col X</em></div>
-              <div class="chip">GST No. <em>Col AC</em></div>
+              <div class="chip">Buyer Co.+End User/Ship <em>Col C</em></div>
+              <div class="chip">GST No. <em>Col D</em></div>
+              <div class="chip">Inquiry No.+Date+Doc <em>Col E</em></div>
+              <div class="chip">Drawing <em>Col F</em></div>
+              <div class="chip">Description <em>Col G</em></div>
+              <div class="chip">Maker+Model No. <em>Col H</em></div>
+              <div class="chip">Equipment Serial No. <em>Col I</em></div>
+              <div class="chip">Yr of Mfg+Type <em>Col J</em></div>
+              <div class="chip">Vessel+IMO <em>Col K</em></div>
+              <div class="chip">Port <em>Col L</em></div>
+              <div class="chip">Currency <em>Col M</em></div>
+              <div class="chip">Buyer Address <em>Col Z</em></div>
+              <div class="chip">Contact+Phone <em>Col AB</em></div>
+              <div class="chip">WA+Emails <em>Col AC</em></div>
+              <div class="chip">PAN+GST Cert <em>Col AF</em></div>
+              <div class="chip">Co. Incorp. Cert <em>Col AG</em></div>
+              <div class="chip">Tax Residency Cert <em>Col AH</em></div>
+              <div class="chip">Co. Reg. Form <em>Col AI</em></div>
+              <div class="chip">Form 10F <em>Col AJ</em></div>
+              <div class="chip">Other Docs 1 <em>Col AK</em></div>
+              <div class="chip">Other Docs 2 <em>Col AL</em></div>
             </div>
           </div>
           <form id="form-a" onsubmit="return false">
@@ -536,11 +547,11 @@ table.log-tbl tr:hover td{background:var(--n50)}
                 <div class="fg"><label class="fl">Currency</label><select id="a-currency"><option value="">Select…</option><option>USD</option><option>EUR</option><option>GBP</option><option>INR</option><option>AED</option><option>SGD</option><option>JPY</option><option>NOK</option><option>SEK</option></select></div>
               </div>
             </div>
-            <!-- Section 2 -->
+            <!-- Section 2: Buyer / Company -->
             <div class="form-section">
               <div class="form-section-hd"><span>🏢</span>Buyer / Company Information</div>
               <div class="fg-grid">
-                <div class="fg full"><label class="fl">Buyer Company Name &amp; End User Name / Ship Name <span class="req">*</span></label><input type="text" id="a-company" placeholder="Company Name — End User or Ship Name" maxlength="70" oninput="cc(this,'a-cc2',70)"><span class="cc" id="a-cc2">0 / 70</span></div>
+                <div class="fg full"><label class="fl">Buyer Company Name &amp; End User/Ship Name <span class="req">*</span></label><input type="text" id="a-company" placeholder="Company Name — End User or Ship Name" maxlength="70" oninput="cc(this,'a-cc2',70)"><span class="cc" id="a-cc2">0 / 70</span></div>
                 <div class="fg"><label class="fl">Buyer Assigned Code</label><input type="text" id="a-code" placeholder="10-digit code" maxlength="10" oninput="cc(this,'a-cc10',10)"><span class="cc" id="a-cc10">0 / 10</span></div>
                 <div class="fg"><label class="fl">GST No.</label><input type="text" id="a-gstno" placeholder="e.g. 27AAAAA0000A1Z5" maxlength="10" oninput="cc(this,'a-cc9',10)"><span class="cc" id="a-cc9">0 / 10</span></div>
                 <div class="fg full"><label class="fl">Buyer Invoicing Address</label><textarea id="a-address" placeholder="Full invoicing address…" maxlength="200" oninput="cc(this,'a-cc7',200)" rows="3"></textarea><span class="cc" id="a-cc7">0 / 200</span></div>
@@ -550,17 +561,7 @@ table.log-tbl tr:hover td{background:var(--n50)}
                 <div class="fg full"><label class="fl">Buyer Email IDs separated by commas</label><input type="text" id="a-emails" placeholder="buyer@co.com, finance@co.com, ops@co.com…" maxlength="200" oninput="cc(this,'a-cc8',200)"><span class="cc" id="a-cc8">0 / 200</span></div>
               </div>
             </div>
-            <!-- Section 3 -->
-            <div class="form-section">
-              <div class="form-section-hd"><span>⚙️</span>Equipment Details</div>
-              <div class="fg-grid">
-                <div class="fg"><label class="fl">Maker</label><input type="text" id="a-maker" placeholder="Manufacturer" maxlength="13" oninput="cc(this,'a-cc11',13)"><span class="cc" id="a-cc11">0 / 13</span></div>
-                <div class="fg"><label class="fl">Equipment Serial No.</label><input type="text" id="a-eqserial" placeholder="Serial number" maxlength="15" oninput="cc(this,'a-cc12',15)"><span class="cc" id="a-cc12">0 / 15</span></div>
-                <div class="fg"><label class="fl">Equipment Manufacture Date</label><input type="text" id="a-eqmfg" placeholder="2018 / Jan-2018" maxlength="13" oninput="cc(this,'a-cc13',13)"><span class="cc" id="a-cc13">0 / 13</span></div>
-                <div class="fg"><label class="fl">Description</label><input type="text" id="a-desc" placeholder="Part or equipment description" maxlength="50" oninput="cc(this,'a-cc3',50)"><span class="cc" id="a-cc3">0 / 50</span></div>
-              </div>
-            </div>
-            <!-- Section 4 -->
+            <!-- Section 3: Vessel & Shipping -->
             <div class="form-section">
               <div class="form-section-hd"><span>🚢</span>Vessel &amp; Shipping</div>
               <div class="fg-grid">
@@ -569,13 +570,44 @@ table.log-tbl tr:hover td{background:var(--n50)}
                 <div class="fg"><label class="fl">Port of Delivery</label><input type="text" id="a-port" placeholder="Rotterdam" maxlength="20" oninput="cc(this,'a-cc6',20)"><span class="cc" id="a-cc6">0 / 20</span></div>
               </div>
             </div>
-            <!-- Section 5 -->
+            <!-- Section 4: Documents -->
             <div class="form-section">
               <div class="form-section-hd"><span>📎</span>Documents</div>
               <div class="fg-grid">
                 <div class="fg"><label class="fl">Inquiry Document (PDF)</label><div class="file-row"><div class="file-btn" onclick="pickFile('a-inqdoc','a-inqdoc-ok')">📎 Attach PDF</div><span class="file-ok" id="a-inqdoc-ok"></span></div><div class="fsz">Max 1 MB</div></div>
                 <div class="fg"><label class="fl">Drawing (PDF)</label><div class="file-row"><div class="file-btn" onclick="pickFile('a-drw','a-drw-ok')">📎 Attach PDF</div><span class="file-ok" id="a-drw-ok"></span></div><div class="fsz">Max 1 MB</div></div>
-                <div class="fg full"><label class="fl">Other Documents (PAN Card / GST Certificate / TRC / Company Incorporation Certificate)</label><div class="file-row"><div class="file-btn" onclick="pickFile('a-otherdoc','a-otherdoc-ok')">📎 Attach PDF</div><span class="file-ok" id="a-otherdoc-ok"></span></div><div class="fsz">Max 5 MB</div></div>
+                <div class="fg"><label class="fl">PAN Card &amp; GST Certificate (PDF)</label><div class="file-row"><div class="file-btn" onclick="pickFile('a-pan','a-pan-ok')">📎 Attach PDF</div><span class="file-ok" id="a-pan-ok"></span></div><div class="fsz">Max 1 MB</div></div>
+                <div class="fg"><label class="fl">Company Incorporation Certificate (PDF)</label><div class="file-row"><div class="file-btn" onclick="pickFile('a-corinc','a-corinc-ok')">📎 Attach PDF</div><span class="file-ok" id="a-corinc-ok"></span></div><div class="fsz">Max 1 MB</div></div>
+                <div class="fg"><label class="fl">Tax Residency Certificate (PDF)</label><div class="file-row"><div class="file-btn" onclick="pickFile('a-trc','a-trc-ok')">📎 Attach PDF</div><span class="file-ok" id="a-trc-ok"></span></div><div class="fsz">Max 1 MB</div></div>
+                <div class="fg"><label class="fl">Completed Company Registration Form (PDF)</label><div class="file-row"><div class="file-btn" onclick="pickFile('a-compreg','a-compreg-ok')">📎 Attach PDF</div><span class="file-ok" id="a-compreg-ok"></span></div><div class="fsz">Max 1 MB</div></div>
+                <div class="fg"><label class="fl">Electronic Form 10F (PDF)</label><div class="file-row"><div class="file-btn" onclick="pickFile('a-10f','a-10f-ok')">📎 Attach PDF</div><span class="file-ok" id="a-10f-ok"></span></div><div class="fsz">Max 1 MB</div></div>
+                <div class="fg"><!-- spacer --></div>
+                <div class="fg full" style="background:var(--surf2);border:1px solid var(--bdr);border-radius:var(--r);padding:10px 12px">
+                  <label class="fl" style="margin-bottom:6px">Other Documents 1</label>
+                  <input type="text" id="a-otherdoc1-text" placeholder="Document description / name" maxlength="40" oninput="cc(this,'a-od1cc',40)" style="margin-bottom:6px">
+                  <span class="cc" id="a-od1cc">0 / 40</span>
+                  <div class="file-row" style="margin-top:5px"><div class="file-btn" onclick="pickFile('a-otherdoc1','a-otherdoc1-ok')">📎 Attach PDF</div><span class="file-ok" id="a-otherdoc1-ok"></span></div>
+                  <div class="fsz">Max 5 MB</div>
+                </div>
+                <div class="fg full" style="background:var(--surf2);border:1px solid var(--bdr);border-radius:var(--r);padding:10px 12px">
+                  <label class="fl" style="margin-bottom:6px">Other Documents 2</label>
+                  <input type="text" id="a-otherdoc2-text" placeholder="Document description / name" maxlength="40" oninput="cc(this,'a-od2cc',40)" style="margin-bottom:6px">
+                  <span class="cc" id="a-od2cc">0 / 40</span>
+                  <div class="file-row" style="margin-top:5px"><div class="file-btn" onclick="pickFile('a-otherdoc2','a-otherdoc2-ok')">📎 Attach PDF</div><span class="file-ok" id="a-otherdoc2-ok"></span></div>
+                  <div class="fsz">Max 5 MB</div>
+                </div>
+              </div>
+            </div>
+            <!-- Section 5: Equipment Details — above Items List -->
+            <div class="form-section">
+              <div class="form-section-hd"><span>⚙️</span>Equipment Details</div>
+              <div class="fg-grid">
+                <div class="fg"><label class="fl">Maker</label><input type="text" id="a-maker" placeholder="Manufacturer" maxlength="13" oninput="cc(this,'a-cc11',13)"><span class="cc" id="a-cc11">0 / 13</span></div>
+                <div class="fg"><label class="fl">Equipment Model No.</label><input type="text" id="a-eqmodel" placeholder="Model number" maxlength="20" oninput="cc(this,'a-cc14',20)"><span class="cc" id="a-cc14">0 / 20</span></div>
+                <div class="fg"><label class="fl">Equipment Serial No.</label><input type="text" id="a-eqserial" placeholder="Serial number" maxlength="15" oninput="cc(this,'a-cc12',15)"><span class="cc" id="a-cc12">0 / 15</span></div>
+                <div class="fg"><label class="fl">Equipment Year of Manufacture</label><input type="text" id="a-eqmfg" placeholder="e.g. 2018" maxlength="13" oninput="cc(this,'a-cc13',13)"><span class="cc" id="a-cc13">0 / 13</span></div>
+                <div class="fg"><label class="fl">Equipment Type</label><input type="text" id="a-eqtype" placeholder="e.g. Pump / Heat Exchanger" maxlength="20" oninput="cc(this,'a-cc15',20)"><span class="cc" id="a-cc15">0 / 20</span></div>
+                <div class="fg"><label class="fl">Description</label><input type="text" id="a-desc" placeholder="Part or equipment description" maxlength="50" oninput="cc(this,'a-cc3',50)"><span class="cc" id="a-cc3">0 / 50</span></div>
               </div>
             </div>
             <!-- Items List -->
@@ -585,10 +617,9 @@ table.log-tbl tr:hover td{background:var(--n50)}
               <table class="items-tbl" id="tbl-a">
                 <thead><tr>
                   <th style="width:34px">#</th>
-                  <th style="min-width:200px">Item Name<br><span style="font-weight:400;font-size:9px;opacity:.7">Enter for new line</span></th>
-                  <th style="min-width:110px">Part No.</th>
-                  <th style="min-width:110px">Serial No.</th>
-                  <th style="width:64px">QTY</th>
+                  <th style="min-width:220px">Item Name<br><span style="font-weight:400;font-size:9px;opacity:.7">Enter for new line</span></th>
+                  <th style="min-width:120px">Part No.</th>
+                  <th style="width:70px">QTY</th>
                   <th>Remark</th>
                   <th style="width:28px"></th>
                 </tr></thead>
@@ -818,24 +849,45 @@ function lss(k,v){localStorage.setItem(k,v)}
 function sId(id,v){var el=document.getElementById(id);if(el)el.textContent=v}
 
 var MAIN_COLS=[
-  "Vendor Code","Inquiry Received At & Date","Buyer Company Name & End User Name",
-  "Inquiry No. & Date & Inquiry Document","Drawing","Description & Maker",
-  "Vessel Name & IMO No.","Port of Delivery","Currency",
-  "Inquiry To Alfa Laval","Quotation Received Date & No. & AMT (From Alfa Laval)",
-  "Distributors Discount Include or Not","Net Weight",
+  "Buyer Assigned Code",
+  "Inquiry Received At & Date",
+  "Buyer Company Name & End User/Ship Name",
+  "GST No.",
+  "Inquiry No. & Date & Inquiry Document",
+  "Drawing",
+  "Description",
+  "Maker & Equipment Model No.",
+  "Equipment Serial No.",
+  "Equipment Year of Manufacture & Type",
+  "Vessel Name & IMO No.",
+  "Port of Delivery",
+  "Currency",
+  "Inquiry To Alfa Laval",
+  "Quotation Received Date & No. & AMT (From Alfa Laval)",
+  "Distributors Discount Include or Not",
+  "Net Weight",
   "Quotation No. & Date & AMT (Send From IMSE BVBA To Party)",
   "PO No. & Date & AMT (Received From Party)",
   "PO No. & Date & AMT (Send To Alfa Laval)",
-  "OA No. & Deliver Date","Proforma Invoice",
+  "OA No. & Deliver Date",
+  "Proforma Invoice",
   "Commercial Invoice No. & Date (Received From Alfa Laval)",
   "Sales Invoice No. & Date (Send From IMSE BVBA To Party)",
-  "Payment Status (Received From Party)","Payment Status (Send To Alfa Laval)",
-  "Buyer Invoicing Address","Buyer Contact Person Name, Destination, Mob No. & Mail Id",
+  "Payment Status (Received From Party)",
+  "Buyer Invoicing Address",
+  "Payment Status (Send To Alfa Laval)",
+  "Buyer Contact Person Name & Phone No.",
+  "Buyer Whatsapp No. & Email IDs",
   "Alfa Laval Address & Contact Person Name",
-  "Completed Vendor Registration Form","PAN Card Copy","Cancelled Cheque",
-  "GST No. (Certificate Copy)","ISO Certificate","Anti-Corruption Policy",
-  "HSSEQ Policy","Tax Residency Certificate (TRC)","No PE Declaration",
-  "Bank Details on Letterhead","Electronic Form 10F","Remark"
+  "Completed Vendor Registration Form",
+  "PAN Card & GST Certificate",
+  "Company Incorporation Certificate",
+  "Tax Residency Certificate",
+  "Completed Company Registration Form",
+  "Electronic Form 10F",
+  "Other Documents 1",
+  "Other Documents 2",
+  "Remark"
 ];
 
 var ROLE_PERMS={
@@ -1277,39 +1329,48 @@ function saveModA(){
         srNo:i+1,
         itemName:itemName,
         partNo:ins[0]&&ins[0].value||'',
-        serialNo:ins[1]&&ins[1].value||'',
-        qty:ins[2]&&ins[2].value||'',
-        remark:ins[3]&&ins[3].value||''
+        qty:ins[1]&&ins[1].value||'',
+        remark:ins[2]&&ins[2].value||''
       });
     }
   });
 
   syncState('busy');
   apiPost('saveInwardInquiry',{
-    inquiryReceivedAt:     document.getElementById('a-rcvdat').value,
-    inquiryReceivedDate:   document.getElementById('a-rcvddate').value,
-    buyerCompanyName:      co,
-    inquiryNo:             iq,
-    inquiryDate:           document.getElementById('a-inqdate').value,
-    currency:              document.getElementById('a-currency').value,
-    buyerAssignedCode:     document.getElementById('a-code').value,
-    gstNo:                 document.getElementById('a-gstno').value,
-    buyerInvoicingAddress: document.getElementById('a-address').value,
-    buyerContactPerson:    document.getElementById('a-contact').value,
-    buyerPhoneNo:          document.getElementById('a-phone').value,
-    buyerWhatsappNo:       document.getElementById('a-whatsapp').value,
-    buyerEmailIds:         document.getElementById('a-emails').value,
-    maker:                 document.getElementById('a-maker').value,
-    equipmentSerialNo:     document.getElementById('a-eqserial').value,
-    equipmentMfgDate:      document.getElementById('a-eqmfg').value,
-    description:           document.getElementById('a-desc').value,
-    vesselName:            document.getElementById('a-vessel').value,
-    vesselImoNo:           document.getElementById('a-imo').value,
-    portOfDelivery:        document.getElementById('a-port').value,
-    inquiryDocumentLink:   document.getElementById('a-inqdoc-ok').textContent||'',
-    drawingLink:           document.getElementById('a-drw-ok').textContent||'',
-    otherDocumentsLink:    document.getElementById('a-otherdoc-ok').textContent||'',
-    items:                 items
+    inquiryReceivedAt:        document.getElementById('a-rcvdat').value,
+    inquiryReceivedDate:      document.getElementById('a-rcvddate').value,
+    buyerCompanyName:         co,
+    inquiryNo:                iq,
+    inquiryDate:              document.getElementById('a-inqdate').value,
+    currency:                 document.getElementById('a-currency').value,
+    buyerAssignedCode:        document.getElementById('a-code').value,
+    gstNo:                    document.getElementById('a-gstno').value,
+    buyerInvoicingAddress:    document.getElementById('a-address').value,
+    buyerContactPerson:       document.getElementById('a-contact').value,
+    buyerPhoneNo:             document.getElementById('a-phone').value,
+    buyerWhatsappNo:          document.getElementById('a-whatsapp').value,
+    buyerEmailIds:            document.getElementById('a-emails').value,
+    maker:                    document.getElementById('a-maker').value,
+    equipmentModelNo:         document.getElementById('a-eqmodel').value,
+    equipmentSerialNo:        document.getElementById('a-eqserial').value,
+    equipmentYearOfMfg:       document.getElementById('a-eqmfg').value,
+    equipmentType:            document.getElementById('a-eqtype').value,
+    description:              document.getElementById('a-desc').value,
+    vesselName:               document.getElementById('a-vessel').value,
+    vesselImoNo:              document.getElementById('a-imo').value,
+    portOfDelivery:           document.getElementById('a-port').value,
+    inquiryDocumentLink:      document.getElementById('a-inqdoc-ok').textContent||'',
+    drawingLink:              document.getElementById('a-drw-ok').textContent||'',
+    panCardGstCertLink:       document.getElementById('a-pan-ok').textContent||'',
+    companyIncorporationLink: document.getElementById('a-corinc-ok').textContent||'',
+    taxResidencyCertLink:     document.getElementById('a-trc-ok').textContent||'',
+    companyRegFormLink:       document.getElementById('a-compreg-ok').textContent||'',
+    electronicForm10fLink:    document.getElementById('a-10f-ok').textContent||'',
+    otherDoc1Text:            document.getElementById('a-otherdoc1-text').value||'',
+    otherDoc1Link:            document.getElementById('a-otherdoc1-ok').textContent||'',
+    otherDoc2Text:            document.getElementById('a-otherdoc2-text').value||'',
+    otherDoc2Link:            document.getElementById('a-otherdoc2-ok').textContent||'',
+    items:                    items
   },function(res){
     if(res.status==='success'){
       toast('✓ Saved! Record ID: '+res.recordId,'ok');
@@ -1451,14 +1512,13 @@ function addItemRow(){
   tr.setAttribute('data-row',n);
   tr.innerHTML=
     '<td class="sr-cell">'+n+'</td>'+
-    '<td style="padding:0;min-width:200px">'+
+    '<td style="padding:0;min-width:220px">'+
       '<textarea class="item-name-ta" placeholder="Item / part name (Enter for new line)" rows="1" '+
         'oninput="autoResizeTa(this)" '+
         'onkeydown="itemTaKeydown(event,this)"></textarea>'+
     '</td>'+
     '<td><input class="item-inp" placeholder="Part No."></td>'+
-    '<td><input class="item-inp" placeholder="Serial No."></td>'+
-    '<td><input class="item-inp" type="number" min="1" style="width:58px"></td>'+
+    '<td><input class="item-inp" type="number" min="1" style="width:64px"></td>'+
     '<td><input class="item-inp" placeholder="Remark" onkeydown="lastFieldKeydown(event,this)"></td>'+
     '<td class="del-cell"><button onclick="delItemRow(this)" title="Remove row">✕</button></td>';
   tbody.appendChild(tr);
