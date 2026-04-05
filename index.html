@@ -828,13 +828,21 @@ table.log-tbl tr:hover td{background:var(--n50)}
 // ════════════════════════════════════════════
 //  CONFIG & SESSION
 // ════════════════════════════════════════════
+// ── HARDCODED DEFAULTS — shared across all users/devices ──
+var DEFAULTS = {
+  url:      'https://script.google.com/macros/s/AKfycbx6rJfia1B9mJzfh6JWK1FVb5qBTT9HKYXjjU4fDmMWq4ANbnSTS9UIllNWNuAWhLbF/exec',
+  sheet:    '1VmvGQJRMBPX1e6QWzX0gvg45CMDPXP7v2QEhCWovBb4',
+  folder:   '18_cGZMXT57JRJE1quoCn30xenN3sLP3z',
+  clientId: '182826215065-pgib5jpd35s08e0boqdjoaf173jh7gro.apps.googleusercontent.com'
+};
+// localStorage overrides defaults (Admin can update via Settings)
 var C={
-  url:      ls('sp_url')      ||'',
-  sheet:    ls('sp_sheet')    ||'',
-  folder:   ls('sp_folder')   ||'',
+  url:      ls('sp_url')      || DEFAULTS.url,
+  sheet:    ls('sp_sheet')    || DEFAULTS.sheet,
+  folder:   ls('sp_folder')   || DEFAULTS.folder,
   user:     ls('sp_user')     ||'Staff',
   pwd:      ls('sp_pwd')      ||'imse2024',
-  clientId: ls('sp_clientid') ||''
+  clientId: ls('sp_clientid') || DEFAULTS.clientId
 };
 
 // Session stored in sessionStorage (cleared on tab close)
